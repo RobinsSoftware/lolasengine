@@ -11,8 +11,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-# C/C++ Files
-*.o
-
-# GLFW
-glfw/*
+# Other
+build
+CactusEngine
