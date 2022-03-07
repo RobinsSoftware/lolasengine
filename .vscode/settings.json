@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "string": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "glfw3.h": "c",
+        "stdbool.h": "c"
     }
 }
