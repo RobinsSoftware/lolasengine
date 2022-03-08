@@ -1,3 +1,9 @@
-[submodule "dependencies/glfw"]
-	path = dependencies/glfw
+[submodule "lolas_simple_engine/dependencies/glfw3"]
+	path = lolas_simple_engine/dependencies/glfw3
+	url = https://github.com/glfw/glfw.git
+[submodule "cactusengine/dependencies/glfw3"]
+	path = cactusengine/dependencies/glfw3
+	url = https://github.com/glfw/glfw.git
+[submodule "dependencies/glfw3"]
+	path = dependencies/glfw3
 	url = https://github.com/glfw/glfw.git

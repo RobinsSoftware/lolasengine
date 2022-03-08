@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "engine.h"
+#include <glfw/glfw3.h>
 
 GLFWwindow *window;
 GLFWmonitor *monitor;
@@ -11,18 +11,7 @@ char* title = "CactusEngine";
 int width = 640, height = 480, target_fps = -1;
 bool fullscreen = false, use_native_res = true, resizable = false;
 
-extern int main();
 extern int launch_window();
-
-int main() {
-    title = "CactusEngine";
-    target_fps = -1;
-    fullscreen = GLFW_FALSE;
-
-    launch_window();
-    
-    return 0;
-}
 
 int launch_window() {
     // GLFW init
