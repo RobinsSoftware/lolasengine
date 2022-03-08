@@ -14,3 +14,7 @@ _deps
 # Other
 build
 .DS_Store
+testgame.exe
+*.exe
+*.app
+*.o
