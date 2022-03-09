@@ -1,5 +1,6 @@
-#include "engine/window.h"
+#include <lolasengine/engine.h>
 
-int main() {
-    launch_window();
+int main(void) {
+    window_resizable(true);
+    window_launch();
 }

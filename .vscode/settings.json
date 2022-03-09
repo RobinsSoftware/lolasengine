@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "engine.h": "c",
+        "stdio.h": "c",
+        "glfw3.h": "c",
+        "stdbool.h": "c"
+    }
+}

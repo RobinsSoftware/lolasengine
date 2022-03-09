@@ -3,10 +3,10 @@
 # +------------------------------------------------------------+
 
 # config
-set(CE_NAME testgame) # project name
-set(CE_VERSION 0.1.0) # project version
-set(CE_OUTPUT_NAME testgame.exe) # file output name
-set(CE_OUTPUT_TYPE WIN32) # file output type (WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL)
+set(LE_NAME testgame) # project name
+set(LE_VERSION 0.1.0) # project version
+set(LE_OUTPUT_NAME testgame.exe) # file output name
+set(LE_OUTPUT_TYPE WIN32) # file output type (WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL)
 
 # +------------------------------------------------------------+
 # |  * internal build script                                   |
@@ -14,7 +14,7 @@ set(CE_OUTPUT_TYPE WIN32) # file output type (WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_A
 
 cmake_minimum_required(VERSION 3.22)
 
-project(${CE_NAME} VERSION 0.1.0)
+project(${LE_NAME} VERSION 0.1.0)
 
 # glfw
 find_package(OpenGL REQUIRED)
@@ -31,7 +31,9 @@ endif()
 
 # engine sources
 add_subdirectory(src)
-add_subdirectory(src/engine)
+add_subdirectory(engine)
 
-add_executable(${CE_OUTPUT_NAME} ${CE_OUTPUT_TYPE} ${GAME_SOURCES} ${ENGINE_SOURCES})
-target_link_libraries(${CE_OUTPUT_NAME} ${OPENGL_LIBRARIES} glfw )
+include_directories(engine/include)
+
+add_executable(${LE_OUTPUT_NAME} ${LE_OUTPUT_TYPE} ${GAME_SOURCES} ${ENGINE_SOURCES})
+target_link_libraries(${LE_OUTPUT_NAME} ${OPENGL_LIBRARIES} glfw )
