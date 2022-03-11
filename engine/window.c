@@ -22,23 +22,25 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
-#include "internal_methods.h"
+#include "internal.h"
 
 // local vars
 static GLFWwindow *window;
 static GLFWmonitor *monitor;
 
-static char *title = "lolasengine";
+static string title = "lolasengine";
 static int width = 640, height = 480, target_fps = -1;
 static bool fullscreen = false, use_native_res = true, resizable = false;
 
 // gets center position (topleft corner pos)
-static int window_center_pos(int screen_dim, int dim) {
+static int window_center_pos(int screen_dim, int dim)
+{
     return (screen_dim - dim) / 2;
 }
 
 // updates window after dimension changes
-static void dimension_update(void) {
+static void dimension_update(void)
+{
     if (window == NULL)
         return;
 
@@ -48,7 +50,7 @@ static void dimension_update(void) {
     int h = fullscreen && use_native_res ? video_mode->height : height;
 
     glfwSetWindowMonitor(window, primary_monitor, window_center_pos(video_mode->width, w),
-            window_center_pos(video_mode->height, h), w, h, target_fps);
+                         window_center_pos(video_mode->height, h), w, h, target_fps);
 
     int red_bits = fullscreen ? video_mode->redBits : GLFW_DONT_CARE;
     int green_bits = fullscreen ? video_mode->greenBits : GLFW_DONT_CARE;
@@ -59,10 +61,45 @@ static void dimension_update(void) {
     glfwWindowHint(GLFW_BLUE_BITS, blue_bits);
 }
 
-int window_launch(void) {
+// free memory after window closes
+static void free_memory()
+{
+    // destroy callbacks
+    glfwSetKeyCallback(window, NULL);
+    glfwSetMouseButtonCallback(window, NULL);
+    glfwSetWindowSizeCallback(window, NULL);
+    glfwSetWindowFocusCallback(window, NULL);
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    __free_callback_memory();
+}
+
+static void window_focus_callback(GLFWwindow *window, int focused)
+{
+    event_call(EVENT_WINDOW_FOCUS_CHANGE, EventWindowFocusChange, window, (bool) focused);
+}
+
+static void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    event_call(EVENT_WINDOW_RESIZE, EventWindowResize, window, width, height);
+}
+
+static void glfw_error_callback(int err_code, const string description) {
+
+}
+
+int window_launch(void)
+{
+    glfwSetErrorCallback(&glfw_error_callback);
+
+    event_call(EVENT_WINDOW_PRE_START, NullArgs);
+
     // glfw init
-    if (!glfwInit()) {
-        printf("[Engine] Cannot initiialize GLFW.");
+    if (!glfwInit())
+    {
+        print_error("Engine cannot enable GLFW.");
         return 1;
     }
 
@@ -93,8 +130,9 @@ int window_launch(void) {
     // create window
     window = glfwCreateWindow(w, h, title, primary_monitor, NULL);
 
-    if (window == NULL) {
-        printf("[Engine] Cannot initiialize GLFW window.");
+    if (window == NULL)
+    {
+        print_error("Engine cannot initiialize GLFW window.");
         glfwTerminate();
         return 1;
     }
@@ -102,12 +140,19 @@ int window_launch(void) {
     // register callbacks
     glfwSetKeyCallback(window, &__glfw_key_callback);
     glfwSetMouseButtonCallback(window, &__glfw_mouse_button_callback);
+    glfwSetWindowSizeCallback(window, &window_size_callback);
+    glfwSetWindowFocusCallback(window, &window_focus_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
     glfwShowWindow(window);
 
-    while (!glfwWindowShouldClose(window)) {
+    event_call(EVENT_WINDOW_START, NullArgs);
+
+    while (!glfwWindowShouldClose(window))
+    {
+        event_call(EVENT_WINDOW_LOOP, NullArgs);
+
         glfwPollEvents();
 
         glClearColor(0.5, 0.5, 0.5, 1);
@@ -116,38 +161,40 @@ int window_launch(void) {
         glfwSwapBuffers(window);
     }
 
-    // destroy callbacks
-    glfwSetKeyCallback(window, NULL);
-    glfwSetMouseButtonCallback(window, NULL);
+    event_call(EVENT_WINDOW_STOP, NullArgs);
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    free_memory();
     return 0;
 }
 
-void window_title(char *window_title) {
+void window_title(string window_title)
+{
     title = window_title;
     if (window != NULL)
         glfwSetWindowTitle(window, title);
 }
 
-void window_size(int window_width, int window_height) {
+void window_size(int window_width, int window_height)
+{
     width = window_width;
     height = window_height;
     dimension_update();
 }
 
-void window_fullscreen(bool window_fullscreen) {
+void window_fullscreen(bool window_fullscreen)
+{
     fullscreen = window_fullscreen;
     dimension_update();
 }
 
-void window_fullscreen_native_resolution(bool window_fullscreen_native_res) {
+void window_fullscreen_native_resolution(bool window_fullscreen_native_res)
+{
     use_native_res = window_fullscreen_native_res;
     dimension_update();
 }
 
-void window_resizable(bool window_resizable) {
+void window_resizable(bool window_resizable)
+{
     resizable = window_resizable;
     dimension_update();
 }

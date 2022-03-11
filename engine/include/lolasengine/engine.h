@@ -21,18 +21,23 @@ Created by Lola Robins
 #define LOLASENGINE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <GLFW/glfw3.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
     // +------------------------------------------------------------+
     // |  * input enums                                             |
     // +------------------------------------------------------------+
 
-    typedef enum {
+    typedef char *string;
+
+    typedef enum
+    {
         SPACE = GLFW_KEY_SPACE,
         APOSTROPHE = GLFW_KEY_APOSTROPHE,
         COMMA = GLFW_KEY_COMMA,
@@ -127,16 +132,16 @@ extern "C" {
         F23 = GLFW_KEY_F23,
         F24 = GLFW_KEY_F24,
         F25 = GLFW_KEY_F25,
-        KP_0 = GLFW_KEY_KP_0,
-        KP_1 = GLFW_KEY_KP_1,
-        KP_2 = GLFW_KEY_KP_2,
-        KP_3 = GLFW_KEY_KP_3,
-        KP_4 = GLFW_KEY_KP_4,
-        KP_5 = GLFW_KEY_KP_5,
-        KP_6 = GLFW_KEY_KP_6,
-        KP_7 = GLFW_KEY_KP_7,
-        KP_8 = GLFW_KEY_KP_8,
-        KP_9 = GLFW_KEY_KP_9,
+        KP0 = GLFW_KEY_KP_0,
+        KP1 = GLFW_KEY_KP_1,
+        KP2 = GLFW_KEY_KP_2,
+        KP3 = GLFW_KEY_KP_3,
+        KP4 = GLFW_KEY_KP_4,
+        KP5 = GLFW_KEY_KP_5,
+        KP6 = GLFW_KEY_KP_6,
+        KP7 = GLFW_KEY_KP_7,
+        KP8 = GLFW_KEY_KP_8,
+        KP9 = GLFW_KEY_KP_9,
         KP_DECIMAL = GLFW_KEY_KP_DECIMAL,
         KP_DIVIDE = GLFW_KEY_KP_DIVIDE,
         KP_MULTIPLY = GLFW_KEY_KP_MULTIPLY,
@@ -155,7 +160,8 @@ extern "C" {
         MENU = GLFW_KEY_MENU
     } Key;
 
-    typedef enum {
+    typedef enum
+    {
         A_BUTTON = GLFW_GAMEPAD_BUTTON_A,
         B_BUTTON = GLFW_GAMEPAD_BUTTON_B,
         X_BUTTON = GLFW_GAMEPAD_BUTTON_X,
@@ -170,13 +176,15 @@ extern "C" {
         DPAD_UP = GLFW_GAMEPAD_BUTTON_DPAD_UP,
         DPAD_DOWN = GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
         DPAD_LEFT = GLFW_GAMEPAD_BUTTON_DPAD_LEFT,
+        DPAD_RIGHT = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,
         CROSS = GLFW_GAMEPAD_BUTTON_CROSS,
         CIRCLE = GLFW_GAMEPAD_BUTTON_CIRCLE,
         SQUARE = GLFW_GAMEPAD_BUTTON_SQUARE,
         TRIANGLE = GLFW_GAMEPAD_BUTTON_TRIANGLE
     } GamepadButton;
 
-    typedef enum {
+    typedef enum
+    {
         MB1 = GLFW_MOUSE_BUTTON_1,
         MB2 = GLFW_MOUSE_BUTTON_2,
         MB3 = GLFW_MOUSE_BUTTON_3,
@@ -187,14 +195,57 @@ extern "C" {
         MB8 = GLFW_MOUSE_BUTTON_8
     } MouseButton;
 
+    typedef enum
+    {
+        PRESS = GLFW_PRESS,
+        HOLD = GLFW_REPEAT,
+        RELEASE = GLFW_RELEASE
+    } InputAction;
+
+    struct EventCallbackList
+    {
+        void *callback;
+        struct EventCallbackList *next;
+    }; 
+
+    // +------------------------------------------------------------+
+    // |  * event ids                                               |
+    // +------------------------------------------------------------+
+
+    #define EVENT_WINDOW_PRE_START 0x00
+    #define EVENT_WINDOW_START 0x01
+    #define EVENT_WINDOW_LOOP 0x02
+    #define EVENT_WINDOW_STOP 0x03
+    #define EVENT_WINDOW_RESIZE 0x04
+    #define EVENT_WINDOW_SCENE_CHANGE 0x05
+    #define EVENT_WINDOW_FOCUS_CHANGE 0x06
+
+    #define EVENT_INPUT_KEY_PRESS 0x07
+    #define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
+
+    // allows for user added events to be added
+    #ifndef EVENT_LAST
+    #define EVENT_LAST 0x08
+    #endif
+
+    typedef void (*NullArgs)();
+
+    typedef void (*EventWindowResize)(GLFWwindow *window, int width, int height);
+    typedef void (*EventWindowFocusChange)(GLFWwindow *window, bool focused);
+
+    typedef void (*EventInputKeyPress)(Key key, InputAction action);
+    typedef void (*EventInputMouseButtonPress)(MouseButton button, InputAction action);
+
     // +------------------------------------------------------------+
     // |  * api methods                                             |
     // +------------------------------------------------------------+
 
+    // window
+
     // launches engine window
     extern int window_launch(void);
     // set the window title
-    extern void window_title(char *window_title);
+    extern void window_title(string window_title);
     // set the size of the window
     extern void window_size(int window_height, int window_width);
     // set window to fullscreen/windowed
@@ -204,12 +255,44 @@ extern "C" {
     // set window can be resized
     extern void window_resizable(bool window_resizable);
 
+    // input
+
     // checks if key is pressed
-    extern bool is_key_pressed(Key key);
+    extern bool input_key_pressed(Key key);
     // checks if mouse button is pressed
-    extern bool is_mouse_button_pressed(MouseButton button);
+    extern bool input_mouse_button_pressed(MouseButton button);
     // checks if gamepad button is pressed
-    extern bool is_gamepad_button_pressed(GamepadButton button);
+    extern bool input_gamepad_button_pressed(GamepadButton button);
+
+    // logging
+
+    // standard log message
+    extern void print(string message);
+    // debug log message
+    extern void print_debug(string message);
+    // error log message
+    extern void print_error(string message);
+
+    // timeutil
+
+    // gets a formatted timestamp for logging purposes (20 bytes min.)
+    extern void timeutil_get_timestamp(string buffer);
+    // gets the current time in microseconds
+    extern uint64_t timeutil_current_time_micros();
+
+    // callback
+
+    // macro for calling events
+    #define event_call(event_id, event_struct, args...)   \
+        for (int i = 0; i < callback_size(event_id); i++) \
+        ((event_struct)callback_get(event_id, i)->callback)(args);
+
+    // register a callback
+    extern void callback_register(int event_id, void *callback);
+    // get a callback linkedlist element
+    extern struct EventCallbackList *callback_get(int event_id, int index);
+    // gets the amount of callbacks registered to an event
+    extern int callback_size(int event_id);
 
 #ifdef __cplusplus
 }

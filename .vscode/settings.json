@@ -3,6 +3,12 @@
         "engine.h": "c",
         "stdio.h": "c",
         "glfw3.h": "c",
-        "stdbool.h": "c"
-    }
+        "stdbool.h": "c",
+        "time.h": "c",
+        "internalmethods.h": "c",
+        "stdlib.h": "c",
+        "internal.h": "c",
+        "stdint.h": "c"
+    },
+    "cmake.configureOnOpen": false
 }

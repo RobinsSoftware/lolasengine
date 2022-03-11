@@ -16,9 +16,3 @@ limitations under the License.
 Created by Lola Robins
 <lola@robinssoftware.ca>
 */
-
-#include <GLFW/glfw3.h>
-
-// glfw callbacks
-extern void __glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-extern void __glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods);

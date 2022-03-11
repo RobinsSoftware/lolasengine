@@ -19,36 +19,45 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
+#include <stdio.h>
+
 static bool keys[GLFW_KEY_LAST];
 static bool clicks[GLFW_MOUSE_BUTTON_LAST];
 static bool buttons[GLFW_GAMEPAD_BUTTON_LAST];
 
 // stores key states
-void __glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void __glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
     if (key == -1)
         return; // MacOS FN key registers as -1
     if (action == GLFW_PRESS)
         keys[key] = true;
     else if (action == GLFW_RELEASE)
         keys[key] = false;
+    event_call(EVENT_INPUT_KEY_PRESS, EventInputKeyPress, key, action);
 }
 
 // stores mouse button states
-void __glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void __glfw_mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
     if (action == GLFW_PRESS)
         clicks[button] = true;
     else if (action == GLFW_RELEASE)
         clicks[button] = false;
+    event_call(EVENT_INPUT_MOUSE_BUTTON_PRESS, EventInputMouseButtonPress, button, action);
 }
 
-bool is_key_pressed(Key key) {
+bool input_key_pressed(Key key)
+{
     return keys[key];
 }
 
-bool is_mouse_button_pressed(MouseButton button) {
+bool input_mouse_button_pressed(MouseButton button)
+{
     return clicks[button];
 }
 
-bool is_gamepad_button_pressed(GamepadButton button) {
+bool input_gamepad_button_pressed(GamepadButton button)
+{
     return buttons[button];
 }

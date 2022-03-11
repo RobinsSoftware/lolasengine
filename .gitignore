@@ -15,6 +15,7 @@ _deps
 build
 .DS_Store
 testgame.exe
+.vscode
 *.exe
 *.app
 *.o
