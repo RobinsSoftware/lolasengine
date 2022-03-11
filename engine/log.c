@@ -22,6 +22,8 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
+#include "internal.h"
+
 void print(string message)
 {
     string buffer = malloc(20);
@@ -43,5 +45,12 @@ void print_error(string message)
     string buffer = malloc(20);
     timeutil_get_timestamp(buffer);
     printf("[%s] ERROR: %s\n", buffer, message);
+    free(buffer);
+}
+
+void __glfw_error_callback(int err_code, const char *description) {
+    string buffer = malloc(20);
+    timeutil_get_timestamp(buffer);
+    printf("[%s] GLFW ERROR: %s\n", buffer, description);
     free(buffer);
 }

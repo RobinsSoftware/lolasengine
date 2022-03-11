@@ -27,15 +27,27 @@ struct EventCallbackList *callbacks[EVENT_LAST + 1];
 // gets last element of the linked list
 static struct EventCallbackList *last(struct EventCallbackList *next)
 {
-    if (next != NULL || next->next != NULL)
-        return last(next);
-    else
-        return next;
+    if (next == NULL)
+        return NULL;
+
+    struct EventCallbackList *cursor = next;
+
+    while (1) {
+        if (cursor->next == NULL)
+            return cursor;
+        cursor = cursor->next;
+    }
 }
 
 void callback_register(int event_id, void *callback)
 {
     struct EventCallbackList *list = malloc(sizeof(struct EventCallbackList));
+
+    if (list == NULL)
+    {
+        print_error("Engine failed memory allocation of EventCallbackList struct (callback_register)");
+        return;
+    }
 
     list->callback = callback;
     list->next = NULL;
@@ -50,8 +62,14 @@ struct EventCallbackList *callback_get(int event_id, int index)
 {
     struct EventCallbackList *list = callbacks[event_id];
 
-    for (int i = 0; (i < index) && (list == NULL || list->next == NULL); i++)
+    for(int i = 0;; i++)
+    {
+        if (i == index)
+            break;
+        if (list == NULL)
+            continue;
         list = list->next;
+    }
 
     return list;
 }

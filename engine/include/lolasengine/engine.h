@@ -20,6 +20,11 @@ Created by Lola Robins
 #ifndef LOLASENGINE_H
 #define LOLASENGINE_H
 
+// silence deprecation warnings for mac glfw
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -36,7 +41,7 @@ extern "C"
 
     typedef char *string;
 
-    typedef enum
+    typedef enum Key
     {
         SPACE = GLFW_KEY_SPACE,
         APOSTROPHE = GLFW_KEY_APOSTROPHE,
@@ -160,7 +165,7 @@ extern "C"
         MENU = GLFW_KEY_MENU
     } Key;
 
-    typedef enum
+    typedef enum GamepadButton
     {
         A_BUTTON = GLFW_GAMEPAD_BUTTON_A,
         B_BUTTON = GLFW_GAMEPAD_BUTTON_B,
@@ -183,7 +188,7 @@ extern "C"
         TRIANGLE = GLFW_GAMEPAD_BUTTON_TRIANGLE
     } GamepadButton;
 
-    typedef enum
+    typedef enum MouseButton
     {
         MB1 = GLFW_MOUSE_BUTTON_1,
         MB2 = GLFW_MOUSE_BUTTON_2,
@@ -195,7 +200,7 @@ extern "C"
         MB8 = GLFW_MOUSE_BUTTON_8
     } MouseButton;
 
-    typedef enum
+    typedef enum InputAction
     {
         PRESS = GLFW_PRESS,
         HOLD = GLFW_REPEAT,
@@ -268,10 +273,13 @@ extern "C"
 
     // standard log message
     extern void print(string message);
+    extern void print_c(const string message);
     // debug log message
     extern void print_debug(string message);
+    extern void print_debug_c(const string message);
     // error log message
     extern void print_error(string message);
+    extern void print_error_c(const string message);
 
     // timeutil
 
@@ -285,7 +293,7 @@ extern "C"
     // macro for calling events
     #define event_call(event_id, event_struct, args...)   \
         for (int i = 0; i < callback_size(event_id); i++) \
-        ((event_struct)callback_get(event_id, i)->callback)(args);
+            ((event_struct)callback_get(event_id, i)->callback)(args);
 
     // register a callback
     extern void callback_register(int event_id, void *callback);

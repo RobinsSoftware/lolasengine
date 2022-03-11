@@ -86,13 +86,9 @@ static void window_size_callback(GLFWwindow *window, int width, int height)
     event_call(EVENT_WINDOW_RESIZE, EventWindowResize, window, width, height);
 }
 
-static void glfw_error_callback(int err_code, const string description) {
-
-}
-
 int window_launch(void)
 {
-    glfwSetErrorCallback(&glfw_error_callback);
+    glfwSetErrorCallback(__glfw_error_callback);
 
     event_call(EVENT_WINDOW_PRE_START, NullArgs);
 
@@ -138,10 +134,10 @@ int window_launch(void)
     }
 
     // register callbacks
-    glfwSetKeyCallback(window, &__glfw_key_callback);
-    glfwSetMouseButtonCallback(window, &__glfw_mouse_button_callback);
-    glfwSetWindowSizeCallback(window, &window_size_callback);
-    glfwSetWindowFocusCallback(window, &window_focus_callback);
+    glfwSetKeyCallback(window, __glfw_key_callback);
+    glfwSetMouseButtonCallback(window, __glfw_mouse_button_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
+    glfwSetWindowFocusCallback(window, window_focus_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
