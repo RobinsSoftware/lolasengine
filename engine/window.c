@@ -70,6 +70,8 @@ static void free_memory()
     glfwSetWindowSizeCallback(window, NULL);
     glfwSetWindowFocusCallback(window, NULL);
 
+    glfwSetErrorCallback(NULL);
+
     glfwDestroyWindow(window);
     glfwTerminate();
 
@@ -89,7 +91,7 @@ static void window_size_callback(GLFWwindow *window, int width, int height)
 int window_launch(void)
 {
     glfwSetErrorCallback(__glfw_error_callback);
-
+    __set_start_time();
     event_call(EVENT_WINDOW_PRE_START, NullArgs);
 
     // glfw init
@@ -145,6 +147,10 @@ int window_launch(void)
 
     event_call(EVENT_WINDOW_START, NullArgs);
 
+    uint64_t frame_start = timeutil_current_time_micros();
+    uint64_t frame_end = timeutil_current_time_micros();
+    uint64_t delta_time = 0;
+
     while (!glfwWindowShouldClose(window))
     {
         event_call(EVENT_WINDOW_LOOP, NullArgs);
@@ -155,6 +161,10 @@ int window_launch(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(window);
+
+        frame_end = timeutil_current_time_micros();
+        delta_time = frame_end - frame_start;
+        frame_start = timeutil_current_time_micros();
     }
 
     event_call(EVENT_WINDOW_STOP, NullArgs);

@@ -211,27 +211,27 @@ extern "C"
     {
         void *callback;
         struct EventCallbackList *next;
-    }; 
+    };
 
     // +------------------------------------------------------------+
     // |  * event ids                                               |
     // +------------------------------------------------------------+
 
-    #define EVENT_WINDOW_PRE_START 0x00
-    #define EVENT_WINDOW_START 0x01
-    #define EVENT_WINDOW_LOOP 0x02
-    #define EVENT_WINDOW_STOP 0x03
-    #define EVENT_WINDOW_RESIZE 0x04
-    #define EVENT_WINDOW_SCENE_CHANGE 0x05
-    #define EVENT_WINDOW_FOCUS_CHANGE 0x06
+#define EVENT_WINDOW_PRE_START 0x00
+#define EVENT_WINDOW_START 0x01
+#define EVENT_WINDOW_LOOP 0x02
+#define EVENT_WINDOW_STOP 0x03
+#define EVENT_WINDOW_RESIZE 0x04
+#define EVENT_WINDOW_SCENE_CHANGE 0x05
+#define EVENT_WINDOW_FOCUS_CHANGE 0x06
 
-    #define EVENT_INPUT_KEY_PRESS 0x07
-    #define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
+#define EVENT_INPUT_KEY_PRESS 0x07
+#define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
 
-    // allows for user added events to be added
-    #ifndef EVENT_LAST
-    #define EVENT_LAST 0x08
-    #endif
+// allows for user added events to be added
+#ifndef EVENT_LAST
+#define EVENT_LAST 0x08
+#endif
 
     typedef void (*NullArgs)();
 
@@ -273,13 +273,13 @@ extern "C"
 
     // standard log message
     extern void print(string message);
-    extern void print_c(const string message);
+    extern void print_s(string source, string message);
     // debug log message
     extern void print_debug(string message);
-    extern void print_debug_c(const string message);
+    extern void print_debug_s(string source, string message);
     // error log message
     extern void print_error(string message);
-    extern void print_error_c(const string message);
+    extern void print_error_s(string source, string message);
 
     // timeutil
 
@@ -297,7 +297,14 @@ extern "C"
 
     // register a callback
     extern void callback_register(int event_id, void *callback);
+    // safely removes and frees events & memory
+    // @return if removal was successful
+    extern bool callback_remove(int event_id, void *callback);
+    // safely removes and frees events & memory for all callback elements pointing to specified void ptr for that event
+    // @return if removal was successful at least once
+    extern bool callback_remove_all(int event_id, void *callback);
     // get a callback linkedlist element
+    // @return linkedlist element of callback, the callback void ptr itself is accessible with struct EventCallbackList->callback
     extern struct EventCallbackList *callback_get(int event_id, int index);
     // gets the amount of callbacks registered to an event
     extern int callback_size(int event_id);

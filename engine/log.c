@@ -32,11 +32,27 @@ void print(string message)
     free(buffer);
 }
 
+void print_s(string source, string message)
+{
+    string buffer = malloc(20);
+    timeutil_get_timestamp(buffer);
+    printf("[%s] INFO <%s>: %s\n", buffer, source, message);
+    free(buffer);
+}
+
 void print_debug(string message)
 {
     string buffer = malloc(20);
     timeutil_get_timestamp(buffer);
     printf("[%s] DEBUG: %s\n", buffer, message);
+    free(buffer);
+}
+
+void print_debug_s(string source, string message)
+{
+    string buffer = malloc(20);
+    timeutil_get_timestamp(buffer);
+    printf("[%s] DEBUG <%s>: %s\n", buffer, source, message);
     free(buffer);
 }
 
@@ -48,9 +64,18 @@ void print_error(string message)
     free(buffer);
 }
 
+void print_error_s(string source, string message)
+{
+    string buffer = malloc(20);
+    timeutil_get_timestamp(buffer);
+    printf("[%s] ERROR <%s>: %s\n", buffer, source, message);
+    free(buffer);
+}
+
+// more convenient then converting types (maybe i change sometime)
 void __glfw_error_callback(int err_code, const char *description) {
     string buffer = malloc(20);
     timeutil_get_timestamp(buffer);
-    printf("[%s] GLFW ERROR: %s\n", buffer, description);
+    printf("[%s] ERROR <GFLW>: %s\n", buffer, description);
     free(buffer);
 }

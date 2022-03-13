@@ -2,20 +2,13 @@
 
 #include <stdio.h>
 
-void key_callback(Key key, InputAction action) {
-    print("1");
+void start_callback() {
+    print("test");
 }
 
-void key_callback2(Key key, InputAction action) {
-    print("2");
-}
-
-void key_callback3(Key key, InputAction action) {
-    print("3");
-}
 int main(void) {
-    callback_register(EVENT_INPUT_KEY_PRESS, &key_callback);
-    callback_register(EVENT_INPUT_KEY_PRESS, &key_callback2);
-    callback_register(EVENT_INPUT_KEY_PRESS, &key_callback3);
+    callback_register(EVENT_WINDOW_START, &start_callback);
+    callback_register(EVENT_WINDOW_START, &start_callback);
+    callback_remove_all(EVENT_WINDOW_START, &start_callback);
     window_launch();
 }

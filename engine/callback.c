@@ -32,7 +32,8 @@ static struct EventCallbackList *last(struct EventCallbackList *next)
 
     struct EventCallbackList *cursor = next;
 
-    while (1) {
+    while (1)
+    {
         if (cursor->next == NULL)
             return cursor;
         cursor = cursor->next;
@@ -45,7 +46,7 @@ void callback_register(int event_id, void *callback)
 
     if (list == NULL)
     {
-        print_error("Engine failed memory allocation of EventCallbackList struct (callback_register)");
+        print_error_s("ENGINE", "Failed memory allocation of EventCallbackList struct (callback_register)");
         return;
     }
 
@@ -56,6 +57,51 @@ void callback_register(int event_id, void *callback)
         callbacks[event_id] = list;
     else
         last(callbacks[event_id])->next = list;
+}
+
+bool callback_remove_all(int event_id, void *callback)
+{
+    // remove first
+    bool return_val = callback_remove(event_id, callback);
+    // remove subsequent
+    while (callback_remove(event_id, callback));
+
+    return return_val;
+}
+
+bool callback_remove(int event_id, void *callback)
+{
+    struct EventCallbackList *cursor = callbacks[event_id];
+    struct EventCallbackList *last;
+
+    while (1)
+    {
+        if (cursor == NULL)
+            return false;
+
+        if (cursor->callback == callback)
+        {
+            if (cursor == callbacks[event_id])
+            {
+                // removes callback at start of linked list
+                struct EventCallbackList *tmp = cursor->next;
+                free(cursor);
+                callbacks[event_id] = tmp;
+            }
+            else
+            {
+                // X->Y->Z to X->Z (Y = element to remove)
+                struct EventCallbackList *tmp = cursor->next;
+                free(cursor);
+                last->next = tmp;
+            }
+
+            return true;
+        }
+
+        last = cursor;
+        cursor = cursor->next;
+    }
 }
 
 struct EventCallbackList *callback_get(int event_id, int index)
