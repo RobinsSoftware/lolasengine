@@ -5,7 +5,7 @@ set(ENGINE_SOURCES
     engine/log.c
     engine/engine.c
     engine/callback.c
-    engine/util/time.c
-    engine/util/file.c
-    engine/datatype/list.c
+    engine/time.c
+    engine/file.c
+    engine/list.c
     PARENT_SCOPE)
