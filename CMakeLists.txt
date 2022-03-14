@@ -12,7 +12,7 @@ set(LE_OUTPUT_TYPE WIN32) # file output type (WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_A
 # |  * internal build script                                   |
 # +------------------------------------------------------------+
 
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.16)
 
 project(${LE_NAME} VERSION 0.1.0)
 

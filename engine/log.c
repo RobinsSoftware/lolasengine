@@ -27,7 +27,7 @@ Created by Lola Robins
 void print(string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] INFO: %s\n", buffer, message);
     free(buffer);
 }
@@ -35,7 +35,7 @@ void print(string message)
 void print_s(string source, string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] INFO <%s>: %s\n", buffer, source, message);
     free(buffer);
 }
@@ -43,7 +43,7 @@ void print_s(string source, string message)
 void print_debug(string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] DEBUG: %s\n", buffer, message);
     free(buffer);
 }
@@ -51,7 +51,7 @@ void print_debug(string message)
 void print_debug_s(string source, string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] DEBUG <%s>: %s\n", buffer, source, message);
     free(buffer);
 }
@@ -59,7 +59,7 @@ void print_debug_s(string source, string message)
 void print_error(string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] ERROR: %s\n", buffer, message);
     free(buffer);
 }
@@ -67,7 +67,7 @@ void print_error(string message)
 void print_error_s(string source, string message)
 {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] ERROR <%s>: %s\n", buffer, source, message);
     free(buffer);
 }
@@ -75,7 +75,7 @@ void print_error_s(string source, string message)
 // more convenient then converting types (maybe i change sometime)
 void __glfw_error_callback(int err_code, const char *description) {
     string buffer = malloc(20);
-    timeutil_get_timestamp(buffer);
+    time_current_string(buffer);
     printf("[%s] ERROR <GFLW>: %s\n", buffer, description);
     free(buffer);
 }

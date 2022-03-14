@@ -22,132 +22,49 @@ Created by Lola Robins
 #include <stdio.h>
 #include <stdlib.h>
 
-struct EventCallbackList *callbacks[EVENT_LAST + 1];
-
-// gets last element of the linked list
-static struct EventCallbackList *last(struct EventCallbackList *next)
-{
-    if (next == NULL)
-        return NULL;
-
-    struct EventCallbackList *cursor = next;
-
-    while (1)
-    {
-        if (cursor->next == NULL)
-            return cursor;
-        cursor = cursor->next;
-    }
-}
+static List callbacks[EVENT_LAST + 1];
 
 void callback_register(int event_id, void *callback)
 {
-    struct EventCallbackList *list = malloc(sizeof(struct EventCallbackList));
-
-    if (list == NULL)
-    {
-        print_error_s("ENGINE", "Failed memory allocation of EventCallbackList struct (callback_register)");
-        return;
-    }
-
-    list->callback = callback;
-    list->next = NULL;
-
     if (callbacks[event_id] == NULL)
-        callbacks[event_id] = list;
-    else
-        last(callbacks[event_id])->next = list;
+        callbacks[event_id] = list_create();
+
+    list_append(callbacks[event_id], callback);
 }
 
-bool callback_remove_all(int event_id, void *callback)
+void callback_remove(int event_id, void *callback)
 {
-    // remove first
-    bool return_val = callback_remove(event_id, callback);
-    // remove subsequent
-    while (callback_remove(event_id, callback));
-
-    return return_val;
-}
-
-bool callback_remove(int event_id, void *callback)
-{
-    struct EventCallbackList *cursor = callbacks[event_id];
-    struct EventCallbackList *last;
-
-    while (1)
-    {
-        if (cursor == NULL)
-            return false;
-
-        if (cursor->callback == callback)
-        {
-            if (cursor == callbacks[event_id])
-            {
-                // removes callback at start of linked list
-                struct EventCallbackList *tmp = cursor->next;
-                free(cursor);
-                callbacks[event_id] = tmp;
-            }
-            else
-            {
-                // X->Y->Z to X->Z (Y = element to remove)
-                struct EventCallbackList *tmp = cursor->next;
-                free(cursor);
-                last->next = tmp;
-            }
-
-            return true;
-        }
-
-        last = cursor;
-        cursor = cursor->next;
-    }
-}
-
-struct EventCallbackList *callback_get(int event_id, int index)
-{
-    struct EventCallbackList *list = callbacks[event_id];
-
-    for(int i = 0;; i++)
-    {
-        if (i == index)
-            break;
-        if (list == NULL)
-            continue;
-        list = list->next;
-    }
-
-    return list;
+    if(callbacks[event_id] == NULL)
+        return;
+    
+    list_remove_value_all(callbacks[event_id], callback);
 }
 
 int callback_size(int event_id)
 {
-    struct EventCallbackList *list = callbacks[event_id];
-    int count = 0;
-
-    while (list != NULL)
-    {
-        list = list->next;
-        count++;
-    }
-
-    return count;
+    if (callbacks[event_id] == NULL)
+        return 0;
+    return callbacks[event_id]->size;
 }
 
+List callback_get(int event_id)
+{
+    return callbacks[event_id];
+}
+
+// when a callback that will never be used again (ie. window start after window is started) it is freed
+void __free_non_repeatable_event(int event_id)
+{
+    if (callbacks[event_id] == NULL)
+        return;
+    
+    list_free(callbacks[event_id]);
+    callbacks[event_id] = NULL;
+}
+
+// shutdown
 void __free_callback_memory()
 {
     for (int i = 0; i < EVENT_LAST; i++)
-    {
-        struct EventCallbackList *current = callbacks[i];
-
-        while (1)
-        {
-            if (current == NULL)
-                break;
-
-            struct EventCallbackList *next = current->next;
-            free(current);
-            current = next;
-        }
-    }
+        __free_non_repeatable_event(i);
 }

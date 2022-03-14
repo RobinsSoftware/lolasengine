@@ -25,23 +25,28 @@ Created by Lola Robins
 
 #include "../internal.h"
 
-uint64_t start_time_micros;
+static uint64_t start_time_micros;
 
 void __set_start_time()
 {
-    start_time_micros = timeutil_current_time_micros();
+    start_time_micros = time_current_micros();
 }
 
-void timeutil_get_timestamp(string buffer)
+uint64_t time_start()
 {
-    time_t t = time(0);
-    struct tm *pt = localtime(&t);
-    sprintf(buffer, "%02d/%02d/%04d-%02d:%02d:%02d", pt->tm_mon, pt->tm_mday, pt->tm_year + 1900, pt->tm_hour, pt->tm_min, pt->tm_sec);
+    return start_time_micros;
 }
 
-uint64_t timeutil_current_time_micros()
+uint64_t time_current_micros()
 {
     struct timeval current;
     gettimeofday(&current, NULL);
     return current.tv_sec * (uint64_t) 1000000 + current.tv_usec;
+}
+
+void time_current_string(string buffer)
+{
+    time_t t = time(0);
+    struct tm *pt = localtime(&t);
+    sprintf(buffer, "%02d/%02d/%04d-%02d:%02d:%02d", pt->tm_mon, pt->tm_mday, pt->tm_year + 1900, pt->tm_hour, pt->tm_min, pt->tm_sec);
 }

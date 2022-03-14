@@ -88,17 +88,18 @@ static void window_size_callback(GLFWwindow *window, int width, int height)
     event_call(EVENT_WINDOW_RESIZE, EventWindowResize, window, width, height);
 }
 
-int window_launch(void)
+ErrorCode window_launch(void)
 {
     glfwSetErrorCallback(__glfw_error_callback);
     __set_start_time();
     event_call(EVENT_WINDOW_PRE_START, NullArgs);
+    __free_non_repeatable_event(EVENT_WINDOW_PRE_START);
 
     // glfw init
     if (!glfwInit())
     {
-        print_error("Engine cannot enable GLFW.");
-        return 1;
+        print_error_s("ENGINE", "Failed to enable GLFW.");
+        return GLFW_INIT_ERROR;
     }
 
     // glfw hints
@@ -130,9 +131,9 @@ int window_launch(void)
 
     if (window == NULL)
     {
-        print_error("Engine cannot initiialize GLFW window.");
+        print_error_s("ENGINE", "Failed to initialize GLFW window.");
         glfwTerminate();
-        return 1;
+        return WINDOW_INIT_ERROR;
     }
 
     // register callbacks
@@ -146,9 +147,10 @@ int window_launch(void)
     glfwShowWindow(window);
 
     event_call(EVENT_WINDOW_START, NullArgs);
+    __free_non_repeatable_event(EVENT_WINDOW_START);
 
-    uint64_t frame_start = timeutil_current_time_micros();
-    uint64_t frame_end = timeutil_current_time_micros();
+    uint64_t frame_start = time_current_micros();
+    uint64_t frame_end = time_current_micros();
     uint64_t delta_time = 0;
 
     while (!glfwWindowShouldClose(window))
@@ -162,15 +164,15 @@ int window_launch(void)
 
         glfwSwapBuffers(window);
 
-        frame_end = timeutil_current_time_micros();
+        frame_end = time_current_micros();
         delta_time = frame_end - frame_start;
-        frame_start = timeutil_current_time_micros();
+        frame_start = time_current_micros();
     }
 
     event_call(EVENT_WINDOW_STOP, NullArgs);
 
     free_memory();
-    return 0;
+    return NO_ERRORS;
 }
 
 void window_title(string window_title)

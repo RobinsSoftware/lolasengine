@@ -17,16 +17,32 @@ Created by Lola Robins
 <lola@robinssoftware.ca>
 */
 
-#include <GLFW/glfw3.h>
+#include <sys/stat.h>
+#include <stdio.h>
 
-// glfw callbacks
-extern void __glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-extern void __glfw_mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
-extern void __glfw_error_callback(int err_code, const char *description);
+#include <lolasengine/engine.h>
 
-// memory freeing
-extern void __free_callback_memory();
-extern void __free_non_repeatable_event(int event_id);
+int file_sizeof(string file_name)
+{   
+    #ifdef _WIN32
+    struct _stat file_info;
 
-// time util engine start time
-extern void __set_start_time();
+    if (_stat(file_name, &file_info != 0))
+    #else
+    struct stat file_info;
+
+    if (stat(file_name, &file_info) == -1)
+    #endif
+    {
+        return -1;
+    }
+
+    return file_info.st_size;
+}
+
+void file_read(string file_name, size_t buffer_size, uint8_t *buffer)
+{
+    FILE *file = fopen(file_name, "r");
+    fread(buffer, 1, buffer_size, file);
+    fclose(file);
+}

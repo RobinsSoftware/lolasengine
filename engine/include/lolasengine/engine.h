@@ -35,11 +35,66 @@ extern "C"
 {
 #endif
 
-    // +------------------------------------------------------------+
-    // |  * input enums                                             |
-    // +------------------------------------------------------------+
+    // engine error codes
+
+    typedef enum ErrorCode {
+        NO_ERRORS,
+        GLFW_INIT_ERROR,
+        WINDOW_INIT_ERROR
+    } ErrorCode;
+
+    // custom types
 
     typedef char *string;
+
+    // +------------------------------------------------------------+
+    // |  * math                                                    |
+    // +------------------------------------------------------------+
+
+    // TODO
+
+    // +------------------------------------------------------------+
+    // |  * double linked lists                                     |
+    // +------------------------------------------------------------+
+
+    typedef struct ListNode {
+        void *value;
+        struct ListNode *next, *previous;
+    } *ListNode;
+
+    typedef struct List {
+        struct ListNode *first_node, *last_node;
+        size_t size;
+    } *List;
+
+    // creates a new list
+    // note: must be freed after use with list_free(List list);
+    // @return new list ptr
+    extern List list_create();
+    // gets a node at an index
+    // @return NULL ptr if out of bounds
+    extern ListNode list_get_index(List list, int index);
+    // finds a node given a value
+    // @return NULL ptr if none
+    extern ListNode list_get_value_first(List list, void *value);
+    // appends an item to a list
+    extern void list_append(List list, void *value);
+    // removes a list node from a list
+    extern void list_remove_node(List list, ListNode node);
+    // removes node at the specified index from a list
+    extern void list_remove_index(List list, int index);
+    // removes the first value matching the provided value in a list
+    extern void list_remove_value_first(List list, void *value);
+    // removes all nodes matching the provided value in a list
+    extern void list_remove_value_all(List list, void *value);
+    // clears the contents of a list
+    extern void list_clear(List list);
+    // frees the memory of a list
+    extern void list_free(List list);
+
+    // +------------------------------------------------------------+
+    // |  * input                                                   |
+    // +------------------------------------------------------------+
 
     typedef enum Key
     {
@@ -163,7 +218,8 @@ extern "C"
         RIGHT_ALT = GLFW_KEY_RIGHT_ALT,
         RIGHT_SUPER = GLFW_KEY_RIGHT_SUPER,
         MENU = GLFW_KEY_MENU
-    } Key;
+    }
+    Key;
 
     typedef enum GamepadButton
     {
@@ -186,7 +242,8 @@ extern "C"
         CIRCLE = GLFW_GAMEPAD_BUTTON_CIRCLE,
         SQUARE = GLFW_GAMEPAD_BUTTON_SQUARE,
         TRIANGLE = GLFW_GAMEPAD_BUTTON_TRIANGLE
-    } GamepadButton;
+    }
+    GamepadButton;
 
     typedef enum MouseButton
     {
@@ -198,40 +255,45 @@ extern "C"
         MB6 = GLFW_MOUSE_BUTTON_6,
         MB7 = GLFW_MOUSE_BUTTON_7,
         MB8 = GLFW_MOUSE_BUTTON_8
-    } MouseButton;
+    }
+    MouseButton;
 
     typedef enum InputAction
     {
         PRESS = GLFW_PRESS,
         HOLD = GLFW_REPEAT,
         RELEASE = GLFW_RELEASE
-    } InputAction;
+    }
+    InputAction;
 
-    struct EventCallbackList
-    {
-        void *callback;
-        struct EventCallbackList *next;
-    };
+    // checks if key is pressed
+    extern bool input_key_pressed(Key key);
+    // checks if mouse button is pressed
+    extern bool input_mouse_button_pressed(MouseButton button);
+    // checks if gamepad button is pressed
+    extern bool input_gamepad_button_pressed(GamepadButton button);
 
     // +------------------------------------------------------------+
-    // |  * event ids                                               |
+    // |  * callback                                                |
     // +------------------------------------------------------------+
 
-#define EVENT_WINDOW_PRE_START 0x00
-#define EVENT_WINDOW_START 0x01
-#define EVENT_WINDOW_LOOP 0x02
-#define EVENT_WINDOW_STOP 0x03
-#define EVENT_WINDOW_RESIZE 0x04
-#define EVENT_WINDOW_SCENE_CHANGE 0x05
-#define EVENT_WINDOW_FOCUS_CHANGE 0x06
+    typedef void *Callback;
 
-#define EVENT_INPUT_KEY_PRESS 0x07
-#define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
+    #define EVENT_WINDOW_PRE_START 0x00
+    #define EVENT_WINDOW_START 0x01
+    #define EVENT_WINDOW_LOOP 0x02
+    #define EVENT_WINDOW_STOP 0x03
+    #define EVENT_WINDOW_RESIZE 0x04
+    #define EVENT_WINDOW_SCENE_CHANGE 0x05
+    #define EVENT_WINDOW_FOCUS_CHANGE 0x06
 
-// allows for user added events to be added
-#ifndef EVENT_LAST
-#define EVENT_LAST 0x08
-#endif
+    #define EVENT_INPUT_KEY_PRESS 0x07
+    #define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
+
+    // allows for user added events to be added
+    #ifndef EVENT_LAST
+    #define EVENT_LAST 0x08
+    #endif
 
     typedef void (*NullArgs)();
 
@@ -241,6 +303,48 @@ extern "C"
     typedef void (*EventInputKeyPress)(Key key, InputAction action);
     typedef void (*EventInputMouseButtonPress)(MouseButton button, InputAction action);
 
+    // macro for calling events
+    #define event_call(event_id, event_void, args...)\
+        for (int i = 0; i < callback_size(event_id); i++)\
+            ((event_void) list_get_index(callback_get(event_id), i)->value)(args);
+        
+        
+    // register a callback
+    extern void callback_register(int event_id, void *callback);
+    // safely removes and frees events & memory
+    // @return if removal was successful
+    extern void callback_remove(int event_id, void *callback);
+    // get a list storing callbacks for a given event id
+    // @return list of callbacks, they can be accessed by iterating through the elements
+    extern List callback_get(int event_id);
+    // gets the amount of callbacks registered to an event
+    extern int callback_size(int event_id);
+
+    // +------------------------------------------------------------+
+    // |  * shader                                                  |
+    // +------------------------------------------------------------+
+
+    typedef enum ShaderType
+    {
+        FRAGMENT,
+        VERTEX
+    }
+    ShaderType;
+
+    struct Shader
+    {
+        ShaderType type;
+        string source;
+        GLuint _glid;
+    };
+    ShaderType type;
+
+    struct ShaderProgram
+    {
+        GLuint _glid;
+        bool _inuse;
+    };
+    
     // +------------------------------------------------------------+
     // |  * api methods                                             |
     // +------------------------------------------------------------+
@@ -248,7 +352,8 @@ extern "C"
     // window
 
     // launches engine window
-    extern int window_launch(void);
+    // @return window exit status code
+    extern ErrorCode window_launch(void);
     // set the window title
     extern void window_title(string window_title);
     // set the size of the window
@@ -259,15 +364,6 @@ extern "C"
     extern void window_fullscreen_native_resolution(bool window_fullscreen_native_res);
     // set window can be resized
     extern void window_resizable(bool window_resizable);
-
-    // input
-
-    // checks if key is pressed
-    extern bool input_key_pressed(Key key);
-    // checks if mouse button is pressed
-    extern bool input_mouse_button_pressed(MouseButton button);
-    // checks if gamepad button is pressed
-    extern bool input_gamepad_button_pressed(GamepadButton button);
 
     // logging
 
@@ -281,33 +377,22 @@ extern "C"
     extern void print_error(string message);
     extern void print_error_s(string source, string message);
 
-    // timeutil
+    // time
 
-    // gets a formatted timestamp for logging purposes (20 bytes min.)
-    extern void timeutil_get_timestamp(string buffer);
+    // gets the time the window started at
+    extern uint64_t time_start();
     // gets the current time in microseconds
-    extern uint64_t timeutil_current_time_micros();
+    extern uint64_t time_current_micros();
+    // gets a formatted timestamp for logging purposes (20 bytes min.)
+    extern void time_current_string(string buffer);
 
-    // callback
+    // file
 
-    // macro for calling events
-    #define event_call(event_id, event_struct, args...)   \
-        for (int i = 0; i < callback_size(event_id); i++) \
-            ((event_struct)callback_get(event_id, i)->callback)(args);
-
-    // register a callback
-    extern void callback_register(int event_id, void *callback);
-    // safely removes and frees events & memory
-    // @return if removal was successful
-    extern bool callback_remove(int event_id, void *callback);
-    // safely removes and frees events & memory for all callback elements pointing to specified void ptr for that event
-    // @return if removal was successful at least once
-    extern bool callback_remove_all(int event_id, void *callback);
-    // get a callback linkedlist element
-    // @return linkedlist element of callback, the callback void ptr itself is accessible with struct EventCallbackList->callback
-    extern struct EventCallbackList *callback_get(int event_id, int index);
-    // gets the amount of callbacks registered to an event
-    extern int callback_size(int event_id);
+    // get size of a file
+    // @return size of file in bytes, will return -1 if file isn't found
+    extern int file_sizeof(string file_name);
+    // reads contents of file to buffer
+    extern void file_read(string file_name, size_t buffer_size, uint8_t *buffer);
 
 #ifdef __cplusplus
 }
