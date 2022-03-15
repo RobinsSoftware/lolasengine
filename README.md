@@ -1,9 +1,8 @@
 # lolasengine
-custom game engine experiment by lola robins
 
 ## info
 lolasengine is an experimental open-source engine
-it is entirely written in c, and is intended to be a simple beginner experiment
+it is entirely written in c, and is intended to be a simple beginner experiment for me to learn c and more about engine programming
 
 please feel free to give me feedback on my work, i am hoping to make as much improvements as possible throughout the lifecycle of this project!
 
