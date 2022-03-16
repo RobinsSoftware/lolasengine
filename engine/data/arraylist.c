@@ -17,36 +17,17 @@ Created by Lola Robins
 <lola@robinssoftware.ca>
 */
 
-#include <stdio.h>
-#include <time.h>
-#include <sys/time.h>
+#include <stdlib.h>
 
 #include <lolasengine/engine.h>
 
-#include "../internal.h"
-
-static uint64_t start_time_micros;
-
-void __set_start_time()
+ArrayList arraylist_create(size_t element_size)
 {
-    start_time_micros = time_current_micros();
-}
+    ArrayList list = calloc(1, sizeof(struct ArrayList));
 
-uint64_t time_start()
-{
-    return start_time_micros;
-}
+    if(list == NULL)
+        print_error_s("ENGINE", "Failed to allocate memory for ArrayList.");
 
-uint64_t time_current_micros()
-{
-    struct timeval current;
-    gettimeofday(&current, NULL);
-    return current.tv_sec * (uint64_t) 1000000 + current.tv_usec;
-}
-
-void time_current_string(string buffer)
-{
-    time_t t = time(0);
-    struct tm *pt = localtime(&t);
-    sprintf(buffer, "%02d/%02d/%04d-%02d:%02d:%02d", pt->tm_mon, pt->tm_mday, pt->tm_year + 1900, pt->tm_hour, pt->tm_min, pt->tm_sec);
+    list->element_size = element_size;
+    return list;
 }

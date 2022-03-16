@@ -16,10 +16,3 @@ limitations under the License.
 Created by Lola Robins
 <lola@robinssoftware.ca>
 */
-
-#include <lolasengine/engine.h>
-
-struct ShaderProgram shader_create_program()
-{
-    
-}

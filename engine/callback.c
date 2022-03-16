@@ -17,19 +17,18 @@ Created by Lola Robins
 <lola@robinssoftware.ca>
 */
 
-#include <lolasengine/engine.h>
-
-#include <stdio.h>
 #include <stdlib.h>
 
-static List callbacks[EVENT_LAST + 1];
+#include <lolasengine/engine.h>
+
+static DLList callbacks[EVENT_LAST + 1];
 
 void callback_register(int event_id, void *callback)
 {
     if (callbacks[event_id] == NULL)
-        callbacks[event_id] = list_create();
+        callbacks[event_id] = dllist_create();
 
-    list_append(callbacks[event_id], callback);
+    dllist_append(callbacks[event_id], callback);
 }
 
 void callback_remove(int event_id, void *callback)
@@ -37,7 +36,7 @@ void callback_remove(int event_id, void *callback)
     if(callbacks[event_id] == NULL)
         return;
     
-    list_remove_value_all(callbacks[event_id], callback);
+    dllist_remove_value_all(callbacks[event_id], callback);
 }
 
 int callback_size(int event_id)
@@ -47,7 +46,7 @@ int callback_size(int event_id)
     return callbacks[event_id]->size;
 }
 
-List callback_get(int event_id)
+DLList callback_get(int event_id)
 {
     return callbacks[event_id];
 }
@@ -58,7 +57,7 @@ void __free_non_repeatable_event(int event_id)
     if (callbacks[event_id] == NULL)
         return;
     
-    list_free(callbacks[event_id]);
+    dllist_free(callbacks[event_id]);
     callbacks[event_id] = NULL;
 }
 

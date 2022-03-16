@@ -16,3 +16,7 @@ limitations under the License.
 Created by Lola Robins
 <lola@robinssoftware.ca>
 */
+
+#include <lolasengine/engine.h>
+
+static ArrayList groups[GC_LAST + 1];

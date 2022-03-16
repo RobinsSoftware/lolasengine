@@ -51,46 +51,123 @@ extern "C"
     // |  * math                                                    |
     // +------------------------------------------------------------+
 
-    // TODO
+    // vectors & matricies
+
+    #define __vector_struct_template(type, size, components...)\
+    typedef struct Vector_ ## type ## _ ## size\
+    {\
+        type components;\
+    }\
+    *Vector_ ## type ## _ ## size;\
+    \
+    typedef union Vector_ ## type ## _ ## size ## U\
+    {\
+        struct Vector_ ## type ## _ ## size vector;\
+        type type ## _array[size];\
+    }\
+    Vector_ ## type ## _ ## size ## U
+
+    #define __matrix_struct_template(type, size_x, size_y, components...)\
+    typedef struct Matrix_ ## type ## _ ## size_x ## x ## size_y\
+    {\
+        type components;\
+    }\
+    *Matrix_ ## type ## _ ## size_x ## x ## size_y;\
+    \
+    typedef union Matrix_ ## type ## _ ## size_x ## x ## size_y ## U\
+    {\
+        struct Matrix_ ## type ## _ ## size_x ## x ## size_y matrix;\
+        type type ## _array[size_x * size_y];\
+    }\
+    Matrix_ ## type ## _ ## size_x ## x ## size_y ## U
+
+    __matrix_struct_template(double, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(double, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(double, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(double, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(double, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __matrix_struct_template(int, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(int, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(int, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(int, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(int, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __matrix_struct_template(float, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(float, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(float, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(float, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(float, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __vector_struct_template(double, 2, x, y);
+    __vector_struct_template(double, 3, x, y, z);
+    __vector_struct_template(double, 4, x, y, z, w);
+    __vector_struct_template(int, 2, x, y);
+    __vector_struct_template(int, 3, x, y, z);
+    __vector_struct_template(int, 4, x, y, z, w);
+    __vector_struct_template(float, 2, x, y);
+    __vector_struct_template(float, 3, x, y, z);
+    __vector_struct_template(float, 4, x, y, z, w);
 
     // +------------------------------------------------------------+
-    // |  * double linked lists                                     |
+    // |  * array lists                                             |
     // +------------------------------------------------------------+
 
-    typedef struct ListNode {
+    typedef struct ArrayList
+    {
+        void* array;
+        size_t size, element_size;
+    }
+    *ArrayList;
+    
+
+    // +------------------------------------------------------------+
+    // |  * doubly linked lists                                     |
+    // +------------------------------------------------------------+
+
+    typedef struct DLListNode
+    {
         void *value;
-        struct ListNode *next, *previous;
-    } *ListNode;
+        struct DLListNode *next, *previous;
+    }
+    *DLListNode;
 
-    typedef struct List {
-        struct ListNode *first_node, *last_node;
+    typedef struct DLList
+    {
+        struct DLListNode *first_node, *last_node;
         size_t size;
-    } *List;
+    }
+    *DLList;
 
     // creates a new list
-    // note: must be freed after use with list_free(List list);
+    // note: must be freed after use with dllist_free(List list);
     // @return new list ptr
-    extern List list_create();
+    extern DLList dllist_create();
+    // gets the size of a list
+    extern int dllist_size(DLList list);
+    // gets the value stored in a list node
+    extern void* dllist_value(DLListNode node);
     // gets a node at an index
     // @return NULL ptr if out of bounds
-    extern ListNode list_get_index(List list, int index);
+    extern DLListNode dllist_get_index(DLList list, int index);
     // finds a node given a value
     // @return NULL ptr if none
-    extern ListNode list_get_value_first(List list, void *value);
+    extern DLListNode dllist_get_value_first(DLList list, void *value);
+    // replaces the value at a specified index
+    extern void dllist_set_index(DLList list, int index, void *value);
+    // replaces the value of the first list item that matches the search ptr
+    extern void dllist_set_value_first(DLList list, void *value, void* new_value);
     // appends an item to a list
-    extern void list_append(List list, void *value);
+    extern void dllist_append(DLList list, void *value);
     // removes a list node from a list
-    extern void list_remove_node(List list, ListNode node);
+    extern void dllist_remove_node(DLList list, DLListNode node);
     // removes node at the specified index from a list
-    extern void list_remove_index(List list, int index);
+    extern void dllist_remove_index(DLList list, int index);
     // removes the first value matching the provided value in a list
-    extern void list_remove_value_first(List list, void *value);
+    extern void dllist_remove_value_first(DLList list, void *value);
     // removes all nodes matching the provided value in a list
-    extern void list_remove_value_all(List list, void *value);
+    extern void dllist_remove_value_all(DLList list, void *value);
     // clears the contents of a list
-    extern void list_clear(List list);
+    extern void dllist_clear(DLList list);
     // frees the memory of a list
-    extern void list_free(List list);
+    extern void dllist_free(DLList list);
 
     // +------------------------------------------------------------+
     // |  * input                                                   |
@@ -274,6 +351,26 @@ extern "C"
     extern bool input_gamepad_button_pressed(GamepadButton button);
 
     // +------------------------------------------------------------+
+    // |  * garbage collector                                       |
+    // +------------------------------------------------------------+
+
+    #define GC_END_OF_PROGRAM 0x00
+    #define GC_WINDOW_LAUNCH 0x01
+    #define GC_WINDOW_STOP 0x02
+    #define GC_RESERVE_1 0x03
+    #define GC_RESERVE_2 0x04
+    #define GC_RESERVE_3 0x05
+    #define GC_RESERVE_4 0x06
+    #define GC_GROUP_1 0x07
+    #define GC_GROUP_2 0x08
+    #define GC_GROUP_3 0x09
+    #define GC_GROUP_4 0x0A
+
+    #ifndef GC_LAST
+    #define GC_LAST GC_GROUP_4
+    #endif
+
+    // +------------------------------------------------------------+
     // |  * callback                                                |
     // +------------------------------------------------------------+
 
@@ -292,7 +389,7 @@ extern "C"
 
     // allows for user added events to be added
     #ifndef EVENT_LAST
-    #define EVENT_LAST 0x08
+    #define EVENT_LAST EVENT_INPUT_MOUSE_BUTTON_PRESS
     #endif
 
     typedef void (*NullArgs)();
@@ -306,7 +403,7 @@ extern "C"
     // macro for calling events
     #define event_call(event_id, event_void, args...)\
         for (int i = 0; i < callback_size(event_id); i++)\
-            ((event_void) list_get_index(callback_get(event_id), i)->value)(args);
+            ((event_void) dllist_get_index(callback_get(event_id), i)->value)(args)
         
         
     // register a callback
@@ -316,7 +413,7 @@ extern "C"
     extern void callback_remove(int event_id, void *callback);
     // get a list storing callbacks for a given event id
     // @return list of callbacks, they can be accessed by iterating through the elements
-    extern List callback_get(int event_id);
+    extern DLList callback_get(int event_id);
     // gets the amount of callbacks registered to an event
     extern int callback_size(int event_id);
 
@@ -331,19 +428,21 @@ extern "C"
     }
     ShaderType;
 
-    struct Shader
+    typedef struct Shader
     {
         ShaderType type;
         string source;
         GLuint _glid;
-    };
-    ShaderType type;
+    }
+    *Shader;
 
-    struct ShaderProgram
+    typedef struct ShaderProgram
     {
+        DLList shaders;
         GLuint _glid;
         bool _inuse;
-    };
+    }
+    *ShaderProgram;
     
     // +------------------------------------------------------------+
     // |  * api methods                                             |

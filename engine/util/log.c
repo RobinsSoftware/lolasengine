@@ -22,8 +22,6 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
-#include "internal.h"
-
 void print(string message)
 {
     string buffer = malloc(20);

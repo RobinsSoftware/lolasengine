@@ -16,33 +16,3 @@ limitations under the License.
 Created by Lola Robins
 <lola@robinssoftware.ca>
 */
-
-#include <sys/stat.h>
-#include <stdio.h>
-
-#include <lolasengine/engine.h>
-
-int file_sizeof(string file_name)
-{   
-    #ifdef _WIN32
-    struct _stat file_info;
-
-    if (_stat(file_name, &file_info != 0))
-    #else
-    struct stat file_info;
-
-    if (stat(file_name, &file_info) == -1)
-    #endif
-    {
-        return -1;
-    }
-
-    return file_info.st_size;
-}
-
-void file_read(string file_name, size_t buffer_size, uint8_t *buffer)
-{
-    FILE *file = fopen(file_name, "r");
-    fread(buffer, 1, buffer_size, file);
-    fclose(file);
-}

@@ -22,7 +22,7 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
-#include "internal.h"
+#include "../internal.h"
 
 // local vars
 static GLFWwindow *window;

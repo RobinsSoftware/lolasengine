@@ -18,31 +18,39 @@ Created by Lola Robins
 */
 
 #include <stdlib.h>
-#include <stdio.h>
 
 #include <lolasengine/engine.h>
 
-List list_create()
+DLList dllist_create()
 {
-    List list = malloc(sizeof(struct List));
+    DLList list = calloc(1, sizeof(struct DLList));
 
     if  (list == NULL)
-    {   
-        print_error_s("ENGINE", "Failed to allocate ListNode element.");
-        return NULL;
-    }
+        print_error_s("ENGINE", "Failed to allocate memory for DLList.");
 
-    list->first_node = NULL;
-    list->last_node = NULL;
-    list->size = 0;
     return list;
 }
 
-ListNode list_get_index(List list, int index)
+int dllist_size(DLList list)
+{
+    return list->size;
+}
+
+void* dllist_value(DLListNode node)
+{
+    return node->value;
+}
+
+void dllist_set_index(DLList list, int index, void *value)
+{
+    dllist_get_index(list, index)->value = value;
+}
+
+DLListNode dllist_get_index(DLList list, int index)
 {
     // starts from side closest to
     bool direction = !(index > (list->size / 2));
-    ListNode cursor = direction ? list->first_node : list->last_node;
+    DLListNode cursor = direction ? list->first_node : list->last_node;
 
     for (
         int i = direction ? 0 : list->size - 1;
@@ -62,9 +70,14 @@ ListNode list_get_index(List list, int index)
     return cursor;
 }
 
-ListNode list_get_value_first(List list, void *value)
+void dllist_set_value_first(DLList list, void *value, void* new_value)
 {
-    ListNode cursor = list->first_node;
+    dllist_get_value_first(list, value)->value = new_value;
+}
+
+DLListNode dllist_get_value_first(DLList list, void *value)
+{
+    DLListNode cursor = list->first_node;
     
     for (int i = 0; i < list->size; i++)
     {
@@ -77,18 +90,17 @@ ListNode list_get_value_first(List list, void *value)
     return NULL;
 }
 
-void list_append(List list, void *value)
+void dllist_append(DLList list, void *value)
 {
-    ListNode node = malloc(sizeof(struct ListNode));
+    DLListNode node = calloc(1, sizeof(struct DLListNode));
 
     if  (node == NULL)
     {   
-        print_error_s("ENGINE", "Failed to allocate ListNode element.");
+        print_error_s("ENGINE", "Failed to allocate memory for DLListNode.");
         return;
     }
 
     node->value = value;
-    node->next = NULL;
     node->previous = list->last_node;
     list->size++;
 
@@ -100,7 +112,7 @@ void list_append(List list, void *value)
     list->last_node = node;
 }
 
-void list_remove_node(List list, ListNode node)
+void dllist_remove_node(DLList list, DLListNode node)
 {
     if (list->first_node == node)
     {   
@@ -125,17 +137,17 @@ void list_remove_node(List list, ListNode node)
     free(node);
 }
 
-void list_remove_index(List list, int index)
+void dllist_remove_index(DLList list, int index)
 {
-    list_remove_node(list, list_get_index(list, index));
+    dllist_remove_node(list, dllist_get_index(list, index));
 }
 
-void list_remove_value_first(List list, void *value)
+void dllist_remove_value_first(DLList list, void *value)
 {
-    list_remove_node(list, list_get_value_first(list, value));
+    dllist_remove_node(list, dllist_get_value_first(list, value));
 }
 
-void list_remove_value_all(List list, void *value)
+void dllist_remove_value_all(DLList list, void *value)
 {
     // time saving instead of constantly iterating over list?!
     int size = list->size;
@@ -147,13 +159,13 @@ void list_remove_value_all(List list, void *value)
             break;
 
         size = list->size;
-        list_remove_node(list, list_get_value_first(list, value));
+        dllist_remove_node(list, dllist_get_value_first(list, value));
     }
 }
 
-void list_clear(List list)
+void dllist_clear(DLList list)
 {
-    ListNode cursor = list->first_node;
+    DLListNode cursor = list->first_node;
 
     for(int i = 0; i < list->size - 1; i++)
     {
@@ -167,8 +179,8 @@ void list_clear(List list)
     list->size = 0;
 }
 
-void list_free(List list)
+void dllist_free(DLList list)
 {
-    list_clear(list);
+    dllist_clear(list);
     free(list);
 }
