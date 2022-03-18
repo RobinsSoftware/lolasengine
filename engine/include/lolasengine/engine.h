@@ -35,6 +35,10 @@ extern "C"
 {
 #endif
 
+    // +------------------------------------------------------------+
+    // |  * data/                                                   |
+    // +------------------------------------------------------------+
+
     // engine error codes
 
     typedef enum ErrorCode {
@@ -46,81 +50,16 @@ extern "C"
     // custom types
 
     typedef char *string;
+    typedef uint8_t byte;
 
-    // +------------------------------------------------------------+
-    // |  * math                                                    |
-    // +------------------------------------------------------------+
-
-    // vectors & matricies
-
-    #define __vector_struct_template(type, size, components...)\
-    typedef struct Vector_ ## type ## _ ## size\
-    {\
-        type components;\
-    }\
-    *Vector_ ## type ## _ ## size;\
-    \
-    typedef union Vector_ ## type ## _ ## size ## U\
-    {\
-        struct Vector_ ## type ## _ ## size vector;\
-        type type ## _array[size];\
-    }\
-    Vector_ ## type ## _ ## size ## U
-
-    #define __matrix_struct_template(type, size_x, size_y, components...)\
-    typedef struct Matrix_ ## type ## _ ## size_x ## x ## size_y\
-    {\
-        type components;\
-    }\
-    *Matrix_ ## type ## _ ## size_x ## x ## size_y;\
-    \
-    typedef union Matrix_ ## type ## _ ## size_x ## x ## size_y ## U\
-    {\
-        struct Matrix_ ## type ## _ ## size_x ## x ## size_y matrix;\
-        type type ## _array[size_x * size_y];\
-    }\
-    Matrix_ ## type ## _ ## size_x ## x ## size_y ## U
-
-    __matrix_struct_template(double, 2, 2, m0, m1, m2, m3);
-    __matrix_struct_template(double, 3, 2, m0, m1, m2, m3, m4, m5);
-    __matrix_struct_template(double, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
-    __matrix_struct_template(double, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
-    __matrix_struct_template(double, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
-    __matrix_struct_template(int, 2, 2, m0, m1, m2, m3);
-    __matrix_struct_template(int, 3, 2, m0, m1, m2, m3, m4, m5);
-    __matrix_struct_template(int, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
-    __matrix_struct_template(int, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
-    __matrix_struct_template(int, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
-    __matrix_struct_template(float, 2, 2, m0, m1, m2, m3);
-    __matrix_struct_template(float, 3, 2, m0, m1, m2, m3, m4, m5);
-    __matrix_struct_template(float, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
-    __matrix_struct_template(float, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
-    __matrix_struct_template(float, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
-    __vector_struct_template(double, 2, x, y);
-    __vector_struct_template(double, 3, x, y, z);
-    __vector_struct_template(double, 4, x, y, z, w);
-    __vector_struct_template(int, 2, x, y);
-    __vector_struct_template(int, 3, x, y, z);
-    __vector_struct_template(int, 4, x, y, z, w);
-    __vector_struct_template(float, 2, x, y);
-    __vector_struct_template(float, 3, x, y, z);
-    __vector_struct_template(float, 4, x, y, z, w);
-
-    // +------------------------------------------------------------+
-    // |  * array lists                                             |
-    // +------------------------------------------------------------+
+    // lists
 
     typedef struct ArrayList
     {
-        void* array;
-        size_t size, element_size;
+        void *array;
+        size_t size;
     }
     *ArrayList;
-    
-
-    // +------------------------------------------------------------+
-    // |  * doubly linked lists                                     |
-    // +------------------------------------------------------------+
 
     typedef struct DLListNode
     {
@@ -136,14 +75,33 @@ extern "C"
     }
     *DLList;
 
-    // creates a new list
+    // creates a new arraylist
+    // @return new list ptr
+    extern ArrayList arraylist_create();
+    // gets the size of an arraylist
+    extern int arraylist_size(ArrayList list);
+    // gets the value stored at the index
+    extern void *arraylist_get(ArrayList list, int index);
+    // sets the value at a given index
+    extern void arraylist_set(ArrayList list, int index, void *value);
+    // adds a value to the arraylist
+    extern void arraylist_add(ArrayList list, void *value);
+    // adds the values of an array to an arraylist
+    // @param elements amount of items in the array to copy
+    extern void arraylist_add_array(ArrayList list, void *array, size_t elements);
+    // adds the values of an arraylist to another arraylist
+    extern void arraylist_add_arraylist(ArrayList list, ArrayList add);
+    // clears an arraylist
+    extern void arraylist_clear(ArrayList list);
+
+    // creates a new doubly linked list
     // note: must be freed after use with dllist_free(List list);
     // @return new list ptr
     extern DLList dllist_create();
     // gets the size of a list
     extern int dllist_size(DLList list);
     // gets the value stored in a list node
-    extern void* dllist_value(DLListNode node);
+    extern void *dllist_value(DLListNode node);
     // gets a node at an index
     // @return NULL ptr if out of bounds
     extern DLListNode dllist_get_index(DLList list, int index);
@@ -170,8 +128,66 @@ extern "C"
     extern void dllist_free(DLList list);
 
     // +------------------------------------------------------------+
-    // |  * input                                                   |
+    // |  * render/                                                 |
     // +------------------------------------------------------------+
+
+    typedef enum ShaderType
+    {
+        FRAGMENT,
+        VERTEX
+    }
+    ShaderType;
+
+    typedef struct Shader
+    {
+        ShaderType type;
+        string source;
+        GLuint _glid;
+    }
+    *Shader;
+
+    typedef struct ShaderProgram
+    {
+        DLList shaders;
+        GLuint _glid;
+        bool _inuse;
+    }
+    *ShaderProgram;
+
+    // +------------------------------------------------------------+
+    // |  * util/                                                   |
+    // +------------------------------------------------------------+
+
+    // logging
+
+    // standard log message
+    extern void print(string message);
+    extern void print_s(string source, string message);
+    // debug log message
+    extern void print_debug(string message);
+    extern void print_debug_s(string source, string message);
+    // error log message
+    extern void print_error(string message);
+    extern void print_error_s(string source, string message);
+
+    // time
+
+    // gets the time the window started at
+    extern uint64_t time_start();
+    // gets the current time in microseconds
+    extern uint64_t time_current_micros();
+    // gets a formatted timestamp for logging purposes (20 bytes min.)
+    extern void time_current_string(string buffer);
+
+    // file
+
+    // get size of a file
+    // @return size of file in bytes, will return -1 if file isn't found
+    extern int file_sizeof(string file_name);
+    // reads contents of file to buffer
+    extern void file_read(string file_name, size_t buffer_size, uint8_t *buffer);
+
+    // input
 
     typedef enum Key
     {
@@ -351,30 +367,104 @@ extern "C"
     extern bool input_gamepad_button_pressed(GamepadButton button);
 
     // +------------------------------------------------------------+
-    // |  * garbage collector                                       |
+    // |  * math/                                                   |
     // +------------------------------------------------------------+
 
+    // vectors & matricies
+
+    #define __vector_struct_template(type, size, components...)\
+    typedef struct Vector_ ## type ## _ ## size\
+    {\
+        type components;\
+    }\
+    *Vector_ ## type ## _ ## size;\
+    \
+    typedef union Vector_ ## type ## _ ## size ## U\
+    {\
+        struct Vector_ ## type ## _ ## size vector;\
+        type type ## _array[size];\
+    }\
+    Vector_ ## type ## _ ## size ## U;
+
+    #define __matrix_struct_template(type, size_x, size_y, components...)\
+    typedef struct Matrix_ ## type ## _ ## size_x ## x ## size_y\
+    {\
+        type components;\
+    }\
+    *Matrix_ ## type ## _ ## size_x ## x ## size_y;\
+    \
+    typedef union Matrix_ ## type ## _ ## size_x ## x ## size_y ## U\
+    {\
+        struct Matrix_ ## type ## _ ## size_x ## x ## size_y matrix;\
+        type type ## _array[size_x * size_y];\
+    }\
+    Matrix_ ## type ## _ ## size_x ## x ## size_y ## U;
+
+    __matrix_struct_template(double, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(double, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(double, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(double, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(double, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __matrix_struct_template(int, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(int, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(int, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(int, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(int, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __matrix_struct_template(float, 2, 2, m0, m1, m2, m3);
+    __matrix_struct_template(float, 3, 2, m0, m1, m2, m3, m4, m5);
+    __matrix_struct_template(float, 3, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8);
+    __matrix_struct_template(float, 4, 3, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    __matrix_struct_template(float, 4, 4, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    __vector_struct_template(double, 2, x, y);
+    __vector_struct_template(double, 3, x, y, z);
+    __vector_struct_template(double, 4, x, y, z, w);
+    __vector_struct_template(int, 2, x, y);
+    __vector_struct_template(int, 3, x, y, z);
+    __vector_struct_template(int, 4, x, y, z, w);
+    __vector_struct_template(float, 2, x, y);
+    __vector_struct_template(float, 3, x, y, z);
+    __vector_struct_template(float, 4, x, y, z, w);
+
+    // +------------------------------------------------------------+
+    // |  * /                                                       |
+    // +------------------------------------------------------------+
+
+    // garbage collector
+
+    typedef void (*MemoryFinalizer)(void *memory);
+        
+    typedef struct MemoryNode
+    {
+        void *memory;
+        MemoryFinalizer finalizer;
+    }
+    *MemoryNode;
+
     #define GC_END_OF_PROGRAM 0x00
-    #define GC_WINDOW_LAUNCH 0x01
-    #define GC_WINDOW_STOP 0x02
-    #define GC_RESERVE_1 0x03
-    #define GC_RESERVE_2 0x04
-    #define GC_RESERVE_3 0x05
-    #define GC_RESERVE_4 0x06
-    #define GC_GROUP_1 0x07
-    #define GC_GROUP_2 0x08
-    #define GC_GROUP_3 0x09
-    #define GC_GROUP_4 0x0A
+    #define GC_RESERVE_1 0x01
+    #define GC_RESERVE_2 0x02
+    #define GC_RESERVE_3 0x03
+    #define GC_RESERVE_4 0x04
+    #define GC_GROUP_1 0x05
+    #define GC_GROUP_2 0x06
+    #define GC_GROUP_3 0x07
+    #define GC_GROUP_4 0x08
 
     #ifndef GC_LAST
     #define GC_LAST GC_GROUP_4
     #endif
 
-    // +------------------------------------------------------------+
-    // |  * callback                                                |
-    // +------------------------------------------------------------+
+    // track memory for removal with a specified group during runtime
+    extern void memory_track(int group_id, void *memory, MemoryFinalizer finalizer);
+    // track memory for removal after an event is called during runtime
+    // @param finalizer MemoryFinalizer callbacks run before the engine kills the memory
+    extern void memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer);
+    // free all memory of a group
+    extern void memory_free_all(int group_id);
+    // frees all memory assigned to an event after an event has finished execution
+    extern void memory_free_all_event(int event_id);
 
-    typedef void *Callback;
+    // callbacks
 
     #define EVENT_WINDOW_PRE_START 0x00
     #define EVENT_WINDOW_START 0x01
@@ -424,28 +514,7 @@ extern "C"
     typedef enum ShaderType
     {
         FRAGMENT,
-        VERTEX
-    }
-    ShaderType;
-
-    typedef struct Shader
-    {
-        ShaderType type;
-        string source;
-        GLuint _glid;
-    }
-    *Shader;
-
-    typedef struct ShaderProgram
-    {
-        DLList shaders;
-        GLuint _glid;
-        bool _inuse;
-    }
-    *ShaderProgram;
-    
-    // +------------------------------------------------------------+
-    // |  * api methods                                             |
+    // |  * /render                                                 |
     // +------------------------------------------------------------+
 
     // window
@@ -464,34 +533,13 @@ extern "C"
     // set window can be resized
     extern void window_resizable(bool window_resizable);
 
-    // logging
+    // shader
 
-    // standard log message
-    extern void print(string message);
-    extern void print_s(string source, string message);
-    // debug log message
-    extern void print_debug(string message);
-    extern void print_debug_s(string source, string message);
-    // error log message
-    extern void print_error(string message);
-    extern void print_error_s(string source, string message);
-
-    // time
-
-    // gets the time the window started at
-    extern uint64_t time_start();
-    // gets the current time in microseconds
-    extern uint64_t time_current_micros();
-    // gets a formatted timestamp for logging purposes (20 bytes min.)
-    extern void time_current_string(string buffer);
-
-    // file
-
-    // get size of a file
-    // @return size of file in bytes, will return -1 if file isn't found
-    extern int file_sizeof(string file_name);
-    // reads contents of file to buffer
-    extern void file_read(string file_name, size_t buffer_size, uint8_t *buffer);
+    extern ShaderProgram shader_create_program();
+    extern void shader_compile_program(ShaderProgram program);
+    extern void shader_link_program(ShaderProgram program);
+    extern void shader_attach_program(ShaderProgram program);
+    extern void shader_free_program(ShaderProgram program);
 
 #ifdef __cplusplus
 }

@@ -76,6 +76,8 @@ static void free_memory()
     glfwTerminate();
 
     __free_callback_memory();
+    
+    memory_free_all(GC_END_OF_PROGRAM);
 }
 
 static void window_focus_callback(GLFWwindow *window, int focused)

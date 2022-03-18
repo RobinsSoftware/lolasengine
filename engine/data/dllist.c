@@ -24,10 +24,7 @@ Created by Lola Robins
 DLList dllist_create()
 {
     DLList list = calloc(1, sizeof(struct DLList));
-
-    if  (list == NULL)
-        print_error_s("ENGINE", "Failed to allocate memory for DLList.");
-
+    memory_track(GC_END_OF_PROGRAM, list, (MemoryFinalizer) &dllist_clear);
     return list;
 }
 
@@ -92,7 +89,7 @@ DLListNode dllist_get_value_first(DLList list, void *value)
 
 void dllist_append(DLList list, void *value)
 {
-    DLListNode node = calloc(1, sizeof(struct DLListNode));
+    DLListNode node = calloc(GC_END_OF_PROGRAM, sizeof(struct DLListNode));
 
     if  (node == NULL)
     {   
@@ -135,6 +132,7 @@ void dllist_remove_node(DLList list, DLListNode node)
 
     list->size--;
     free(node);
+    node = NULL;
 }
 
 void dllist_remove_index(DLList list, int index)
@@ -171,16 +169,12 @@ void dllist_clear(DLList list)
     {
         cursor = cursor->next;
         free(cursor->previous);
+        cursor->previous = NULL;
     }
 
     free(cursor);
+    cursor = NULL;
     list->first_node = NULL;
     list->last_node = NULL;
     list->size = 0;
-}
-
-void dllist_free(DLList list)
-{
-    dllist_clear(list);
-    free(list);
 }

@@ -24,7 +24,8 @@ Created by Lola Robins
 
 ShaderProgram shader_create_program()
 {
-    ShaderProgram program = malloc(sizeof(struct ShaderProgram));
+    ShaderProgram program = calloc(1, sizeof(struct ShaderProgram));
+    memory_track(GC_END_OF_PROGRAM, program, (MemoryFinalizer) &shader_free_program);
     program->shaders = dllist_create();
     program->_glid = -1;
     program->_inuse = false;
@@ -68,6 +69,4 @@ void shader_detach_program(ShaderProgram program)
 void shader_free_program(ShaderProgram program)
 {   
     shader_detach_program(program);
-    dllist_free(program->shaders);
-    free(program);
 }

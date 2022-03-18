@@ -2,7 +2,7 @@
 set(ENGINE_SOURCES
     engine/engine.c
     engine/callback.c
-    engine/garbagecollector.c
+    engine/memory.c
     engine/render/window.c
     engine/render/shader.c
     engine/util/input.c
@@ -11,6 +11,6 @@ set(ENGINE_SOURCES
     engine/util/file.c
     engine/data/arraylist.c
     engine/data/dllist.c
-    engine/data/matrix.c
-    engine/data/vector.c
+    engine/math/matrix.c
+    engine/math/vector.c
     PARENT_SCOPE)

@@ -18,16 +18,57 @@ Created by Lola Robins
 */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <lolasengine/engine.h>
 
-ArrayList arraylist_create(size_t element_size)
+ArrayList arraylist_create()
 {
     ArrayList list = calloc(1, sizeof(struct ArrayList));
-
-    if(list == NULL)
-        print_error_s("ENGINE", "Failed to allocate memory for ArrayList.");
-
-    list->element_size = element_size;
+    memory_track(GC_END_OF_PROGRAM, list, (MemoryFinalizer) &arraylist_clear);
     return list;
+}
+
+int arraylist_size(ArrayList list)
+{
+    return list->size;
+}
+
+void *arraylist_get(ArrayList list, int index)
+{
+    return (&list->array)[index];
+}
+
+void arraylist_set(ArrayList list, int index, void *value)
+{
+    (&list->array)[index] = value;
+}
+
+void arraylist_add(ArrayList list, void *value)
+{
+    list->size++;
+    list->array = realloc(list->array, list->size * sizeof(void*));
+    (&list->array)[list->size - 1] = value;
+}
+
+void arraylist_add_array(ArrayList list, void* array, size_t elements)
+{
+    list->size += elements;
+    list->array = realloc(list->array, list->size * sizeof(void*));
+    memcpy((list->array + (list->size - elements) * sizeof(void*)), array, (list->size - elements) * sizeof(void*));
+}
+
+void arraylist_add_arraylist(ArrayList list, ArrayList add)
+{
+    list->size += add->size;
+    list->array = realloc(list->array, list->size * sizeof(void*));
+    memcpy((list->array + (list->size - add->size) * sizeof(void*)), add->array, (list->size - add->size) * sizeof(void*));
+}
+
+void arraylist_clear(ArrayList list)
+{
+    free(list->array);
+    list->array = NULL;
+    list->size = 0;
 }
