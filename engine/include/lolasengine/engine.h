@@ -477,7 +477,6 @@ extern "C"
     #define EVENT_INPUT_KEY_PRESS 0x07
     #define EVENT_INPUT_MOUSE_BUTTON_PRESS 0x08
 
-    // allows for user added events to be added
     #ifndef EVENT_LAST
     #define EVENT_LAST EVENT_INPUT_MOUSE_BUTTON_PRESS
     #endif
@@ -493,9 +492,9 @@ extern "C"
     // macro for calling events
     #define event_call(event_id, event_void, args...)\
         for (int i = 0; i < callback_size(event_id); i++)\
-            ((event_void) dllist_get_index(callback_get(event_id), i)->value)(args)
-        
-        
+            ((event_void) dllist_get_index(callback_get(event_id), i)->value)(args);\
+        memory_free_all_event(event_id);
+    
     // register a callback
     extern void callback_register(int event_id, void *callback);
     // safely removes and frees events & memory
@@ -508,12 +507,6 @@ extern "C"
     extern int callback_size(int event_id);
 
     // +------------------------------------------------------------+
-    // |  * shader                                                  |
-    // +------------------------------------------------------------+
-
-    typedef enum ShaderType
-    {
-        FRAGMENT,
     // |  * /render                                                 |
     // +------------------------------------------------------------+
 
