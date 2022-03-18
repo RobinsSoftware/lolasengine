@@ -18,6 +18,7 @@ Created by Lola Robins
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <lolasengine/engine.h>
 
@@ -89,7 +90,7 @@ DLListNode dllist_get_value_first(DLList list, void *value)
 
 void dllist_append(DLList list, void *value)
 {
-    DLListNode node = calloc(GC_END_OF_PROGRAM, sizeof(struct DLListNode));
+    DLListNode node = calloc(1, sizeof(struct DLListNode));
 
     if  (node == NULL)
     {   
@@ -163,6 +164,9 @@ void dllist_remove_value_all(DLList list, void *value)
 
 void dllist_clear(DLList list)
 {
+    if(!list->size)
+        return;
+
     DLListNode cursor = list->first_node;
 
     for(int i = 0; i < list->size - 1; i++)

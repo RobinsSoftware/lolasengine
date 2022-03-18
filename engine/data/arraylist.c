@@ -37,19 +37,19 @@ int arraylist_size(ArrayList list)
 
 void *arraylist_get(ArrayList list, int index)
 {
-    return (&list->array)[index];
+    return list->array[index];
 }
 
 void arraylist_set(ArrayList list, int index, void *value)
 {
-    (&list->array)[index] = value;
+    list->array[index] = value;
 }
 
 void arraylist_add(ArrayList list, void *value)
 {
     list->size++;
     list->array = realloc(list->array, list->size * sizeof(void*));
-    (&list->array)[list->size - 1] = value;
+    list->array[list->size - 1] = value;
 }
 
 void arraylist_add_array(ArrayList list, void* array, size_t elements)
@@ -67,7 +67,9 @@ void arraylist_add_arraylist(ArrayList list, ArrayList add)
 }
 
 void arraylist_clear(ArrayList list)
-{
+{   
+    if (list->array == NULL)
+        return;
     free(list->array);
     list->array = NULL;
     list->size = 0;

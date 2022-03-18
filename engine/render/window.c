@@ -75,8 +75,6 @@ static void free_memory()
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    __free_callback_memory();
-    
     memory_free_all(GC_END_OF_PROGRAM);
 }
 
@@ -95,7 +93,6 @@ ErrorCode window_launch(void)
     glfwSetErrorCallback(__glfw_error_callback);
     __set_start_time();
     event_call(EVENT_WINDOW_PRE_START, NullArgs);
-    __free_non_repeatable_event(EVENT_WINDOW_PRE_START);
 
     // glfw init
     if (!glfwInit())
@@ -149,7 +146,6 @@ ErrorCode window_launch(void)
     glfwShowWindow(window);
 
     event_call(EVENT_WINDOW_START, NullArgs);
-    __free_non_repeatable_event(EVENT_WINDOW_START);
 
     uint64_t frame_start = time_current_micros();
     uint64_t frame_end = time_current_micros();

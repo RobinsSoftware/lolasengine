@@ -30,6 +30,12 @@ ArrayList events[EVENT_LAST + 1], groups[GC_LAST + 1];
 
 void memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
 {
+    if (memory == NULL)
+    {
+        print_error_s("MEMORY", "Provided memory ptr is null.");
+        return;
+    }
+    
     if (groups[group_id] == NULL)
         groups[group_id] = calloc(1, sizeof(struct ArrayList));
 
@@ -43,62 +49,45 @@ void memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
 
     groups[group_id]->size++;
     groups[group_id]->array = realloc(groups[group_id]->array, groups[group_id]->size * sizeof(void*));
-    (&groups[group_id]->array)[groups[group_id]->size - 1] = node;
+    groups[group_id]->array[groups[group_id]->size - 1] = node;
 }
 
-void memory_event_track(int event_id, void *memory, MemoryFinalizer finalizer)
+void memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer)
 {
+    if (memory == NULL)
+    {
+        print_error_s("MEMORY", "Provided memory ptr is null.");
+        return;
+    }
+
     if (events[event_id] == NULL)
         events[event_id] = calloc(1, sizeof(struct ArrayList));
 
     MemoryNode node = calloc(1, sizeof(struct MemoryNode));
 
     if (events[event_id] == NULL || node == NULL)
-        print_error_s("MEMORY", "Memory allocation failed. (memory_event_track).");
+        print_error_s("MEMORY", "Memory allocation failed. (memory_track_event).");
     
     node->memory = memory; 
     node->finalizer = finalizer;
 
     events[event_id]->size++;
     events[event_id]->array = realloc(events[event_id]->array, events[event_id]->size * sizeof(void*));
-    (&events[event_id]->array)[events[event_id]->size - 1] = node;
-}
-
-//#define __memory_free_all_template(array_name, array_index, method...)\
-void method(int array_index)\
-{\
-    if (array_name[array_index] == NULL)\
-        return;\
-    \
-    for (int i = 0; i < arraylist_size(array_name[array_index]); i++)\
-    {\
-        MemoryNode node = (MemoryNode) arraylist_get(array_name[array_index], i);\
-        \
-        if (node->finalizer != NULL)\
-            ((MemoryFinalizer) node->finalizer)(node->memory);\
-        \
-        free(node->memory);\
-        free(node);\
-    }\
-    \
-    free(array_name[array_index]->array);\
-    free(array_name[array_index]);\
-    \
-    array_name[array_index] = NULL;\
+    events[event_id]->array[events[event_id]->size - 1] = node;
 }
 
 void memory_free_all(int group_id)
 {
     if (groups[group_id] == NULL)
         return;
-    
+
     for (int i = 0; i < arraylist_size(groups[group_id]); i++)
     {
         MemoryNode node = (MemoryNode) arraylist_get(groups[group_id], i);
-
+        
         if (node->finalizer != NULL)
             ((MemoryFinalizer) node->finalizer)(node->memory);
-
+        
         free(node->memory);
         free(node);
         arraylist_set(groups[group_id], i, NULL);
@@ -124,13 +113,11 @@ void memory_free_all_event(int event_id)
         
         free(node->memory);
         free(node);
+        arraylist_set(events[event_id], i, NULL);
     }
     
-    free(events[event_id]->array);
+    arraylist_clear(events[event_id]);
     free(events[event_id]);
     
     events[event_id] = NULL;
 }
-
-//__memory_free_all_template(groups, group_id, memory_free_all);
-//__memory_free_all_template(events, event_id, memory_free_all_event);

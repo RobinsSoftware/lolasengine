@@ -56,7 +56,7 @@ extern "C"
 
     typedef struct ArrayList
     {
-        void *array;
+        void **array;
         size_t size;
     }
     *ArrayList;

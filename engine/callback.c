@@ -50,21 +50,3 @@ DLList callback_get(int event_id)
 {
     return callbacks[event_id];
 }
-
-// when a callback that will never be used again (ie. window start after window is started) it is freed
-void __free_non_repeatable_event(int event_id)
-{
-    //if (callbacks[event_id] == NULL)
-    //    return;
-    
-    // replace with killing code when methods are made
-    //dllist_free(callbacks[event_id]);
-    //callbacks[event_id] = NULL;
-}
-
-// shutdown
-void __free_callback_memory()
-{
-    //for (int i = 0; i < EVENT_LAST; i++)
-    //    __free_non_repeatable_event(i);
-}

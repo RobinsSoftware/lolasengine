@@ -24,9 +24,5 @@ extern void __glfw_key_callback(GLFWwindow *window, int key, int scancode, int a
 extern void __glfw_mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 extern void __glfw_error_callback(int err_code, const char *description);
 
-// memory freeing
-extern void __free_callback_memory();
-extern void __free_non_repeatable_event(int event_id);
-
 // time util engine start time
 extern void __set_start_time();
