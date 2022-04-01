@@ -36,7 +36,7 @@ void callback_remove(int event_id, void *callback)
     if(callbacks[event_id] == NULL)
         return;
     
-    dllist_remove_value_all(callbacks[event_id], callback);
+    dllist_remove_all(callbacks[event_id], callback);
 }
 
 int callback_size(int event_id)

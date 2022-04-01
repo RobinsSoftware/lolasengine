@@ -39,12 +39,12 @@ void* dllist_value(DLListNode node)
     return node->value;
 }
 
-void dllist_set_index(DLList list, int index, void *value)
+void* dllist_get(DLList list, int index)
 {
-    dllist_get_index(list, index)->value = value;
+    return dllist_get_node(list, index)->value;
 }
 
-DLListNode dllist_get_index(DLList list, int index)
+DLListNode dllist_get_node(DLList list, int index)
 {
     // starts from side closest to
     bool direction = !(index > (list->size / 2));
@@ -68,12 +68,7 @@ DLListNode dllist_get_index(DLList list, int index)
     return cursor;
 }
 
-void dllist_set_value_first(DLList list, void *value, void* new_value)
-{
-    dllist_get_value_first(list, value)->value = new_value;
-}
-
-DLListNode dllist_get_value_first(DLList list, void *value)
+DLListNode dllist_get_node_with_value(DLList list, void *value)
 {
     DLListNode cursor = list->first_node;
     
@@ -87,6 +82,17 @@ DLListNode dllist_get_value_first(DLList list, void *value)
 
     return NULL;
 }
+
+void dllist_set(DLList list, int index, void *value)
+{
+    dllist_get_node(list, index)->value = value;
+}
+
+void dllist_set_value_first(DLList list, void *value, void* new_value)
+{
+    dllist_get_node_with_value(list, value)->value = new_value;
+}
+
 
 void dllist_append(DLList list, void *value)
 {
@@ -138,15 +144,15 @@ void dllist_remove_node(DLList list, DLListNode node)
 
 void dllist_remove_index(DLList list, int index)
 {
-    dllist_remove_node(list, dllist_get_index(list, index));
+    dllist_remove_node(list, dllist_get_node(list, index));
 }
 
-void dllist_remove_value_first(DLList list, void *value)
+void dllist_remove__first(DLList list, void *value)
 {
-    dllist_remove_node(list, dllist_get_value_first(list, value));
+    dllist_remove_node(list, dllist_get_node_with_value(list, value));
 }
 
-void dllist_remove_value_all(DLList list, void *value)
+void dllist_remove_all(DLList list, void *value)
 {
     // time saving instead of constantly iterating over list?!
     int size = list->size;
@@ -158,7 +164,7 @@ void dllist_remove_value_all(DLList list, void *value)
             break;
 
         size = list->size;
-        dllist_remove_node(list, dllist_get_value_first(list, value));
+        dllist_remove_node(list, dllist_get_node_with_value(list, value));
     }
 }
 

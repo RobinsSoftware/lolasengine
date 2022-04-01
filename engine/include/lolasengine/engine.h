@@ -101,15 +101,19 @@ extern "C"
     // gets the size of a list
     extern int dllist_size(DLList list);
     // gets the value stored in a list node
+    // @return NULL ptr if node doesn't exist
     extern void *dllist_value(DLListNode node);
+    // gets the value at an index
+    // @return NULL ptr if out of bounds
+    extern void *dllist_get(DLList list, int index);
     // gets a node at an index
     // @return NULL ptr if out of bounds
-    extern DLListNode dllist_get_index(DLList list, int index);
+    extern DLListNode dllist_get_node(DLList list, int index);
     // finds a node given a value
     // @return NULL ptr if none
-    extern DLListNode dllist_get_value_first(DLList list, void *value);
+    extern DLListNode dllist_get_node_with_value(DLList list, void *value);
     // replaces the value at a specified index
-    extern void dllist_set_index(DLList list, int index, void *value);
+    extern void dllist_set(DLList list, int index, void *value);
     // replaces the value of the first list item that matches the search ptr
     extern void dllist_set_value_first(DLList list, void *value, void* new_value);
     // appends an item to a list
@@ -119,40 +123,13 @@ extern "C"
     // removes node at the specified index from a list
     extern void dllist_remove_index(DLList list, int index);
     // removes the first value matching the provided value in a list
-    extern void dllist_remove_value_first(DLList list, void *value);
+    extern void dllist_remove_first(DLList list, void *value);
     // removes all nodes matching the provided value in a list
-    extern void dllist_remove_value_all(DLList list, void *value);
+    extern void dllist_remove_all(DLList list, void *value);
     // clears the contents of a list
     extern void dllist_clear(DLList list);
     // frees the memory of a list
     extern void dllist_free(DLList list);
-
-    // +------------------------------------------------------------+
-    // |  * render/                                                 |
-    // +------------------------------------------------------------+
-
-    typedef enum ShaderType
-    {
-        FRAGMENT,
-        VERTEX
-    }
-    ShaderType;
-
-    typedef struct Shader
-    {
-        ShaderType type;
-        string source;
-        GLuint _glid;
-    }
-    *Shader;
-
-    typedef struct ShaderProgram
-    {
-        DLList shaders;
-        GLuint _glid;
-        bool _inuse;
-    }
-    *ShaderProgram;
 
     // +------------------------------------------------------------+
     // |  * util/                                                   |
@@ -437,6 +414,8 @@ extern "C"
     {
         void *memory;
         MemoryFinalizer finalizer;
+        bool _event;
+        int _position;
     }
     *MemoryNode;
 
@@ -455,10 +434,10 @@ extern "C"
     #endif
 
     // track memory for removal with a specified group during runtime
-    extern void memory_track(int group_id, void *memory, MemoryFinalizer finalizer);
+    extern MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer);
     // track memory for removal after an event is called during runtime
     // @param finalizer MemoryFinalizer callbacks run before the engine kills the memory
-    extern void memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer);
+    extern MemoryNode memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer);
     // free all memory of a group
     extern void memory_free_all(int group_id);
     // frees all memory assigned to an event after an event has finished execution
@@ -492,7 +471,7 @@ extern "C"
     // macro for calling events
     #define event_call(event_id, event_void, args...)\
         for (int i = 0; i < callback_size(event_id); i++)\
-            ((event_void) dllist_get_index(callback_get(event_id), i)->value)(args);\
+            ((event_void) dllist_get(callback_get(event_id), i))(args);\
         memory_free_all_event(event_id);
     
     // register a callback
@@ -528,6 +507,30 @@ extern "C"
 
     // shader
 
+    typedef enum ShaderType
+    {
+        FRAGMENT,
+        VERTEX
+    }
+    ShaderType;
+
+    typedef struct Shader
+    {
+        ShaderType type;
+        string source, path;
+        GLuint _glid;
+    }
+    *Shader;
+
+    typedef struct ShaderProgram
+    {
+        ArrayList shaders;
+        GLuint _glid;
+        bool _inuse;
+    }
+    *ShaderProgram;
+
+    // intiializes a shader 
     extern ShaderProgram shader_create_program();
     extern void shader_compile_program(ShaderProgram program);
     extern void shader_link_program(ShaderProgram program);

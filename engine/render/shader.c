@@ -18,15 +18,15 @@ Created by Lola Robins
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <lolasengine/engine.h>
-#include <GLFW/glfw3.h>
 
 ShaderProgram shader_create_program()
 {
     ShaderProgram program = calloc(1, sizeof(struct ShaderProgram));
     memory_track(GC_END_OF_PROGRAM, program, (MemoryFinalizer) &shader_free_program);
-    program->shaders = dllist_create();
+    program->shaders = arraylist_create();
     program->_glid = -1;
     program->_inuse = false;
     return program;
@@ -39,7 +39,18 @@ void shader_compile_program(ShaderProgram program)
 
     program->_glid = glCreateProgram();
 
-    // TODO: compile each shader
+    // compile all shaders
+    for (int i = 0; i < program->shaders->size; i++)
+    {
+        Shader shader = (Shader) program->shaders->array[i];
+        shader->_glid = glCreateShader(shader->type);
+
+        GLchar const* src[] = {shader->source};
+        GLint len[] = {strlen(shader->source)};
+        glShaderSource(shader->_glid, 1, src, len);
+
+        glCompileShader(shader->_glid);
+    }
 }
 
 void shader_link_program(ShaderProgram program)

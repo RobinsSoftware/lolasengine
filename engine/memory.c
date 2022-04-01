@@ -28,12 +28,13 @@ Created by Lola Robins
 
 ArrayList events[EVENT_LAST + 1], groups[GC_LAST + 1];
 
-void memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
+
+MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
 {
     if (memory == NULL)
     {
-        print_error_s("MEMORY", "Provided memory ptr is null.");
-        return;
+        print_error_s("MEMORY", "Null memory pointer provided. (memory_track).");
+        return NULL;
     }
     
     if (groups[group_id] == NULL)
@@ -42,22 +43,29 @@ void memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
     MemoryNode node = calloc(1, sizeof(struct MemoryNode));
 
     if (groups[group_id] == NULL || node == NULL)
+    {
         print_error_s("MEMORY", "Memory allocation failed. (memory_track).");
+        return NULL;
+    }
     
     node->memory = memory; 
     node->finalizer = finalizer;
+    node->_event = false;
+    node->_position = group_id;
 
     groups[group_id]->size++;
     groups[group_id]->array = realloc(groups[group_id]->array, groups[group_id]->size * sizeof(void*));
     groups[group_id]->array[groups[group_id]->size - 1] = node;
+
+    return node;
 }
 
-void memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer)
+MemoryNode memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer)
 {
     if (memory == NULL)
     {
-        print_error_s("MEMORY", "Provided memory ptr is null.");
-        return;
+        print_error_s("MEMORY", "Null memory pointer provided. (memory_track_event).");
+        return NULL;
     }
 
     if (events[event_id] == NULL)
@@ -66,14 +74,26 @@ void memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer)
     MemoryNode node = calloc(1, sizeof(struct MemoryNode));
 
     if (events[event_id] == NULL || node == NULL)
+    {
         print_error_s("MEMORY", "Memory allocation failed. (memory_track_event).");
-    
+        return NULL;
+    }
+
     node->memory = memory; 
     node->finalizer = finalizer;
+    node->_event = true;
+    node->_position = event_id;
 
     events[event_id]->size++;
     events[event_id]->array = realloc(events[event_id]->array, events[event_id]->size * sizeof(void*));
     events[event_id]->array[events[event_id]->size - 1] = node;
+    
+    return node;
+}
+
+void memory_track_move(MemoryNode node, bool event, int id)
+{
+    
 }
 
 void memory_free_all(int group_id)
@@ -120,4 +140,9 @@ void memory_free_all_event(int event_id)
     free(events[event_id]);
     
     events[event_id] = NULL;
+}
+
+MemoryNode memory_find(void *value)
+{
+
 }
