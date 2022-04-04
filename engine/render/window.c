@@ -168,7 +168,7 @@ ErrorCode window_launch(void)
     }
 
     event_call(EVENT_WINDOW_STOP, NullArgs);
-
+    
     free_memory();
     return NO_ERRORS;
 }

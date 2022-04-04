@@ -142,7 +142,7 @@ void dllist_remove_node(DLList list, DLListNode node)
     node = NULL;
 }
 
-void dllist_remove_index(DLList list, int index)
+void dllist_remove(DLList list, int index)
 {
     dllist_remove_node(list, dllist_get_node(list, index));
 }

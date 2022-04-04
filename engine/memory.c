@@ -28,7 +28,6 @@ Created by Lola Robins
 
 ArrayList events[EVENT_LAST + 1], groups[GC_LAST + 1];
 
-
 MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
 {
     if (memory == NULL)
@@ -93,7 +92,24 @@ MemoryNode memory_track_event(int event_id, void *memory, MemoryFinalizer finali
 
 void memory_track_move(MemoryNode node, bool event, int id)
 {
-    
+    arraylist_remove_first(node->_event ? events[node->_position] : groups[node->_position], node);
+    arraylist_add(event ? events[id] : groups[id], node);
+
+    node->_event = event;
+    node->_position = id;
+}
+
+void memory_free(void *memory)
+{
+    MemoryNode node = memory_find(memory);
+
+    if(node != NULL)
+    {
+        arraylist_remove_first(node->_event ? events[node->_position] : groups[node->_position], node);
+        free(node);
+    }
+
+    free(memory);
 }
 
 void memory_free_all(int group_id)
@@ -105,12 +121,13 @@ void memory_free_all(int group_id)
     {
         MemoryNode node = (MemoryNode) arraylist_get(groups[group_id], i);
         
+        arraylist_remove(groups[group_id], i);
+
         if (node->finalizer != NULL)
             ((MemoryFinalizer) node->finalizer)(node->memory);
         
         free(node->memory);
         free(node);
-        arraylist_set(groups[group_id], i, NULL);
     }
 
     arraylist_clear(groups[group_id]);
@@ -128,12 +145,13 @@ void memory_free_all_event(int event_id)
     {
         MemoryNode node = (MemoryNode) arraylist_get(events[event_id], i);
         
+        arraylist_remove(events[event_id], i);
+
         if (node->finalizer != NULL)
             ((MemoryFinalizer) node->finalizer)(node->memory);
         
         free(node->memory);
         free(node);
-        arraylist_set(events[event_id], i, NULL);
     }
     
     arraylist_clear(events[event_id]);
@@ -144,5 +162,15 @@ void memory_free_all_event(int event_id)
 
 MemoryNode memory_find(void *value)
 {
+    for (int i = 0; i < GC_LAST+ 1; i++)
+        for (int j = 0; groups[i] != NULL && j < groups[i]->size; i++)
+            if (arraylist_get(groups[i], j) == value)
+                return arraylist_get(groups[i], j);
+                
+    for (int i = 0; i < EVENT_LAST + 1; i++)
+        for (int j = 0; events[i] != NULL && j < events[i]->size; i++)
+            if (arraylist_get(events[i], j) == value)
+                return arraylist_get(events[i], j);
 
+    return NULL;
 }

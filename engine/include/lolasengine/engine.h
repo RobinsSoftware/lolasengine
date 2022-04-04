@@ -86,12 +86,18 @@ extern "C"
     extern void arraylist_set(ArrayList list, int index, void *value);
     // adds a value to the arraylist
     extern void arraylist_add(ArrayList list, void *value);
-    // adds the values of an array to an arraylist
+    // adds the values of an array to the arraylist
     // @param elements amount of items in the array to copy
     extern void arraylist_add_array(ArrayList list, void *array, size_t elements);
     // adds the values of an arraylist to another arraylist
     extern void arraylist_add_arraylist(ArrayList list, ArrayList add);
-    // clears an arraylist
+    // remove an element at a specified index
+    extern void arraylist_remove(ArrayList list, int index);
+    // removes the first element that matches the provided value
+    extern void arraylist_remove_first(ArrayList list, void *value);
+    // removes all elements that match the provided value
+    extern void arraylist_remove_all(ArrayList list, void *value);
+    // clears all elements
     extern void arraylist_clear(ArrayList list);
 
     // creates a new doubly linked list
@@ -121,15 +127,13 @@ extern "C"
     // removes a list node from a list
     extern void dllist_remove_node(DLList list, DLListNode node);
     // removes node at the specified index from a list
-    extern void dllist_remove_index(DLList list, int index);
+    extern void dllist_remove(DLList list, int index);
     // removes the first value matching the provided value in a list
     extern void dllist_remove_first(DLList list, void *value);
     // removes all nodes matching the provided value in a list
     extern void dllist_remove_all(DLList list, void *value);
     // clears the contents of a list
     extern void dllist_clear(DLList list);
-    // frees the memory of a list
-    extern void dllist_free(DLList list);
 
     // +------------------------------------------------------------+
     // |  * util/                                                   |
@@ -419,11 +423,14 @@ extern "C"
     }
     *MemoryNode;
 
+    // memory collection when the game shuts down safely
     #define GC_END_OF_PROGRAM 0x00
+    // reserve collection groups
     #define GC_RESERVE_1 0x01
     #define GC_RESERVE_2 0x02
     #define GC_RESERVE_3 0x03
     #define GC_RESERVE_4 0x04
+    // user preallocated groups
     #define GC_GROUP_1 0x05
     #define GC_GROUP_2 0x06
     #define GC_GROUP_3 0x07
@@ -438,10 +445,14 @@ extern "C"
     // track memory for removal after an event is called during runtime
     // @param finalizer MemoryFinalizer callbacks run before the engine kills the memory
     extern MemoryNode memory_track_event(int event_id, void *memory, MemoryFinalizer finalizer);
+    // frees the provided ptr and removes it from the garbage collector's memory
+    extern void memory_free(void *memory);
     // free all memory of a group
     extern void memory_free_all(int group_id);
     // frees all memory assigned to an event after an event has finished execution
     extern void memory_free_all_event(int event_id);
+    // finds the corresponding node for memory being tracked 
+    extern MemoryNode memory_find(void *value);
 
     // callbacks
 
