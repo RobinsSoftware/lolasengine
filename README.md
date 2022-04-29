@@ -14,6 +14,6 @@ please feel free to give me feedback on my work, i am hoping to make as much imp
 6. make changes to the engine's source code as needed to fit the needs of your project
 
 #### requirements:
-* glfw supported platforms
+* glfw supported platforms (windows, macos, \*ix with x or wayland)
 * c language compiler
 * cmake minimum v3.16
