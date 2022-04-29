@@ -52,9 +52,7 @@ MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
     node->_event = false;
     node->_position = group_id;
 
-    groups[group_id]->size++;
-    groups[group_id]->array = realloc(groups[group_id]->array, groups[group_id]->size * sizeof(void*));
-    groups[group_id]->array[groups[group_id]->size - 1] = node;
+    arraylist_add(groups[group_id], node);
 
     return node;
 }
@@ -83,9 +81,7 @@ MemoryNode memory_track_event(int event_id, void *memory, MemoryFinalizer finali
     node->_event = true;
     node->_position = event_id;
 
-    events[event_id]->size++;
-    events[event_id]->array = realloc(events[event_id]->array, events[event_id]->size * sizeof(void*));
-    events[event_id]->array[events[event_id]->size - 1] = node;
+    arraylist_add(events[event_id], node);
     
     return node;
 }
@@ -103,12 +99,16 @@ void memory_free(void *memory)
 {
     MemoryNode node = memory_find(memory);
 
-    if(node != NULL)
+    if (node != NULL)
     {
         arraylist_remove_first(node->_event ? events[node->_position] : groups[node->_position], node);
+
+        if (node->finalizer != NULL)
+            ((MemoryFinalizer) node->finalizer)(node->memory);
+
         free(node);
     }
-
+    
     free(memory);
 }
 
@@ -121,11 +121,9 @@ void memory_free_all(int group_id)
     {
         MemoryNode node = (MemoryNode) arraylist_get(groups[group_id], i);
         
-        arraylist_remove(groups[group_id], i);
-
         if (node->finalizer != NULL)
             ((MemoryFinalizer) node->finalizer)(node->memory);
-        
+
         free(node->memory);
         free(node);
     }
@@ -140,16 +138,14 @@ void memory_free_all_event(int event_id)
 {
     if (events[event_id] == NULL)
         return;
-    
+
     for (int i = 0; i < arraylist_size(events[event_id]); i++)
     {
         MemoryNode node = (MemoryNode) arraylist_get(events[event_id], i);
-        
-        arraylist_remove(events[event_id], i);
 
         if (node->finalizer != NULL)
             ((MemoryFinalizer) node->finalizer)(node->memory);
-        
+
         free(node->memory);
         free(node);
     }
@@ -162,15 +158,23 @@ void memory_free_all_event(int event_id)
 
 MemoryNode memory_find(void *value)
 {
-    for (int i = 0; i < GC_LAST+ 1; i++)
-        for (int j = 0; groups[i] != NULL && j < groups[i]->size; i++)
-            if (arraylist_get(groups[i], j) == value)
+    for (int i = 0; i < GC_LAST + 1; i++)
+    {
+        if (groups[i] == NULL)
+            continue;
+        for (int j = 0; j < groups[i]->size; i++)
+            if (arraylist_get(groups[i], j) == value) 
                 return arraylist_get(groups[i], j);
-                
+    }
+
     for (int i = 0; i < EVENT_LAST + 1; i++)
-        for (int j = 0; events[i] != NULL && j < events[i]->size; i++)
+    {
+        if (events[i] == NULL)
+            continue;
+        for (int j = 0; j < events[i]->size; i++)
             if (arraylist_get(events[i], j) == value)
                 return arraylist_get(events[i], j);
+    }
 
     return NULL;
 }

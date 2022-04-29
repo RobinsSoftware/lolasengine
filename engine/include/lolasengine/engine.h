@@ -56,24 +56,10 @@ extern "C"
 
     typedef struct ArrayList
     {
-        void **array;
+        void **data;
         size_t size;
     }
     *ArrayList;
-
-    typedef struct DLListNode
-    {
-        void *value;
-        struct DLListNode *next, *previous;
-    }
-    *DLListNode;
-
-    typedef struct DLList
-    {
-        struct DLListNode *first_node, *last_node;
-        size_t size;
-    }
-    *DLList;
 
     // creates a new arraylist
     // @return new list ptr
@@ -99,41 +85,6 @@ extern "C"
     extern void arraylist_remove_all(ArrayList list, void *value);
     // clears all elements
     extern void arraylist_clear(ArrayList list);
-
-    // creates a new doubly linked list
-    // note: must be freed after use with dllist_free(List list);
-    // @return new list ptr
-    extern DLList dllist_create();
-    // gets the size of a list
-    extern int dllist_size(DLList list);
-    // gets the value stored in a list node
-    // @return NULL ptr if node doesn't exist
-    extern void *dllist_value(DLListNode node);
-    // gets the value at an index
-    // @return NULL ptr if out of bounds
-    extern void *dllist_get(DLList list, int index);
-    // gets a node at an index
-    // @return NULL ptr if out of bounds
-    extern DLListNode dllist_get_node(DLList list, int index);
-    // finds a node given a value
-    // @return NULL ptr if none
-    extern DLListNode dllist_get_node_with_value(DLList list, void *value);
-    // replaces the value at a specified index
-    extern void dllist_set(DLList list, int index, void *value);
-    // replaces the value of the first list item that matches the search ptr
-    extern void dllist_set_value_first(DLList list, void *value, void* new_value);
-    // appends an item to a list
-    extern void dllist_append(DLList list, void *value);
-    // removes a list node from a list
-    extern void dllist_remove_node(DLList list, DLListNode node);
-    // removes node at the specified index from a list
-    extern void dllist_remove(DLList list, int index);
-    // removes the first value matching the provided value in a list
-    extern void dllist_remove_first(DLList list, void *value);
-    // removes all nodes matching the provided value in a list
-    extern void dllist_remove_all(DLList list, void *value);
-    // clears the contents of a list
-    extern void dllist_clear(DLList list);
 
     // +------------------------------------------------------------+
     // |  * util/                                                   |
@@ -482,7 +433,7 @@ extern "C"
     // macro for calling events
     #define event_call(event_id, event_void, args...)\
         for (int i = 0; i < callback_size(event_id); i++)\
-            ((event_void) dllist_get(callback_get(event_id), i))(args);\
+            ((event_void) arraylist_get(callback_get(event_id), i))(args);\
         memory_free_all_event(event_id);
     
     // register a callback
@@ -492,7 +443,7 @@ extern "C"
     extern void callback_remove(int event_id, void *callback);
     // get a list storing callbacks for a given event id
     // @return list of callbacks, they can be accessed by iterating through the elements
-    extern DLList callback_get(int event_id);
+    extern ArrayList callback_get(int event_id);
     // gets the amount of callbacks registered to an event
     extern int callback_size(int event_id);
 

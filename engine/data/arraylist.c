@@ -37,54 +37,56 @@ int arraylist_size(ArrayList list)
 
 void *arraylist_get(ArrayList list, int index)
 {
-    return list->array[index];
+    void **data = list->data + (sizeof(void*) * index);
+    return *data;
 }
 
 bool arraylist_contains(ArrayList list, void *value)
 {
     for (int i = 0; i < list->size; i++)
-        if (list->array[i] == value)
+        if (arraylist_get(list, i) == value)
             return true;
     return false;
 }
 
 void arraylist_set(ArrayList list, int index, void *value)
 {
-    list->array[index] = value;
+    void **data = (list->data + (sizeof(void*) * index));
+    *data = value;
 }
 
 void arraylist_add(ArrayList list, void *value)
 {
     list->size++;
-    list->array = realloc(list->array, list->size * sizeof(void*));
-    list->array[list->size - 1] = value;
+    list->data = realloc(list->data, list->size * sizeof(void*));
+    arraylist_set(list, list->size - 1, value);
 }
 
 void arraylist_add_array(ArrayList list, void* array, size_t elements)
 {
     list->size += elements;
-    list->array = realloc(list->array, list->size * sizeof(void*));
-    memcpy((*list->array + (list->size - elements) * sizeof(void*)), array, (list->size - elements) * sizeof(void*));
+    list->data = realloc(list->data, list->size * sizeof(void*));
+    memcpy((*list->data + (list->size - elements) * sizeof(void*)), array, (list->size - elements) * sizeof(void*));
 }
 
 void arraylist_add_arraylist(ArrayList list, ArrayList add)
 {
     list->size += add->size;
-    list->array = realloc(list->array, list->size * sizeof(void*));
-    memcpy((*list->array + ((list->size - add->size) * sizeof(void*))), add->array, (list->size - add->size) * sizeof(void*));
+    list->data = realloc(list->data, list->size * sizeof(void*));
+    memcpy((*list->data + ((list->size - add->size) * sizeof(void*))), add->data, (list->size - add->size) * sizeof(void*));
 }
 
 void arraylist_remove(ArrayList list, int index)
 {
     list->size--;
-    memcpy((*list->array + (index * sizeof(void))), (*list->array + ((index + 1) * sizeof(void))), (list->size - index) * sizeof(void*));
-    list->array = realloc(list->array, list->size * sizeof(void*));
+    memcpy((*list->data + (index * sizeof(void))), (*list->data + ((index + 1) * sizeof(void))), (list->size - index) * sizeof(void*));
+    list->data = realloc(list->data, list->size * sizeof(void*));
 }
 
 void arraylist_remove_first(ArrayList list, void *value)
 {
     for (int i = 0; i < list->size; i++)
-        if (list->array[i] == value)
+        if (list->data == value)
             arraylist_remove(list, i);
 }
 
@@ -96,10 +98,10 @@ void arraylist_remove_all(ArrayList list, void *value)
 
 void arraylist_clear(ArrayList list)
 {   
-    if (list->array == NULL)
+    if (list->data == NULL)
         return;
 
-    free(list->array);
-    list->array = NULL;
+    free(list->data);
+    list->data = NULL;
     list->size = 0;
 }

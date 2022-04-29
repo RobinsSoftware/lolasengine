@@ -18,17 +18,18 @@ Created by Lola Robins
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <lolasengine/engine.h>
 
-static DLList callbacks[EVENT_LAST + 1];
+static ArrayList callbacks[EVENT_LAST + 1];
 
 void callback_register(int event_id, void *callback)
 {
     if (callbacks[event_id] == NULL)
-        callbacks[event_id] = dllist_create();
+        callbacks[event_id] = arraylist_create();
 
-    dllist_append(callbacks[event_id], callback);
+    arraylist_add(callbacks[event_id], callback);
 }
 
 void callback_remove(int event_id, void *callback)
@@ -36,7 +37,7 @@ void callback_remove(int event_id, void *callback)
     if(callbacks[event_id] == NULL)
         return;
     
-    dllist_remove_all(callbacks[event_id], callback);
+    arraylist_remove_all(callbacks[event_id], callback);
 }
 
 int callback_size(int event_id)
@@ -46,7 +47,7 @@ int callback_size(int event_id)
     return callbacks[event_id]->size;
 }
 
-DLList callback_get(int event_id)
+ArrayList callback_get(int event_id)
 {
     return callbacks[event_id];
 }

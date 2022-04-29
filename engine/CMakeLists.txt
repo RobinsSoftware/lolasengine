@@ -10,7 +10,6 @@ set(ENGINE_SOURCES
     engine/util/time.c
     engine/util/file.c
     engine/data/arraylist.c
-    engine/data/dllist.c
     engine/math/matrix.c
     engine/math/vector.c
     PARENT_SCOPE)

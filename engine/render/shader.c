@@ -42,7 +42,7 @@ void shader_compile_program(ShaderProgram program)
     // compile all shaders
     for (int i = 0; i < program->shaders->size; i++)
     {
-        Shader shader = (Shader) program->shaders->array[i];
+        Shader shader = (Shader) arraylist_get(program->shaders, i);
         shader->_glid = glCreateShader(shader->type);
 
         GLchar const* src[] = {shader->source};

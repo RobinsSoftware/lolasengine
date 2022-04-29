@@ -147,9 +147,9 @@ ErrorCode window_launch(void)
 
     event_call(EVENT_WINDOW_START, NullArgs);
 
-    uint64_t frame_start = time_current_micros();
-    uint64_t frame_end = time_current_micros();
-    uint64_t delta_time = 0;
+    unsigned long frame_start = time_current_micros();
+    unsigned long frame_end = time_current_micros();
+    unsigned long delta_time = 0;
 
     while (!glfwWindowShouldClose(window))
     {
