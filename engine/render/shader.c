@@ -77,4 +77,68 @@ void shader_program_detach(ShaderProgram program)
     program->_inuse = false;
 }
 
-vpod
+void shader_program_upload_shader(ShaderProgram program, Shader shader)
+{
+    arraylist_add(program->shaders, shader);
+
+    if (program->_glid == -1)
+        return;
+
+    shader_compile(shader);
+    glAttachShader(program->_glid, shader->_glid);
+}
+
+void shader_program_remove_shader(ShaderProgram program, Shader shader)
+{
+    arraylist_remove_first(program->shaders, shader);
+
+    if (program->_glid == -1)
+        return;
+
+    glDetachShader(program->_glid, shader->_glid);
+}
+
+void shader_program_upload_shaders(ShaderProgram program, ArrayList shaders)
+{
+    for (int i = 0; i < shaders->size; i++)
+        shader_program_upload_shader(program, arraylist_get(shaders, i));
+}
+
+void shader_program_remove_shaders(ShaderProgram program, ArrayList shaders)
+{
+    for (int i = 0; i < shaders->size; i++)
+        shader_program_remove_shader(program, arraylist_get(shaders, i));
+}
+
+Shader shader_create(ShaderType type, bool file, string src)
+{
+    Shader shader = calloc(1, sizeof(struct Shader));
+    memory_track(GC_END_OF_PROGRAM, shader, (MemoryFinalizer) &shader_program_detach);
+    shader->type = type;
+    shader->_glid = -1;
+
+    if (!file)
+    {
+        shader->source = src;
+        shader->_len = strlen(shader->source);
+    }
+    else
+    {
+        shader->_len = file_sizeof(src);
+        uint8_t *buffer = calloc(1, shader->_len);
+        file_read(src, shader->_len, buffer);
+        shader->source = (string) buffer;
+    }
+
+    return shader;
+}
+
+void shader_compile(Shader shader)
+{
+    if (shader->_glid != -1)
+        return;
+
+    shader->_glid = glCreateShader(shader->type);
+    glShaderSource(shader->_glid, 1, (const GLchar *const *) shader->source, (const GLint *) &shader->_len);
+    glCompileShader(shader->_glid);
+}

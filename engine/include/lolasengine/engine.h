@@ -471,8 +471,8 @@ extern "C"
 
     typedef enum ShaderType
     {
-        FRAGMENT,
-        VERTEX
+        FRAGMENT = GL_FRAGMENT_SHADER,
+        VERTEX = GL_VERTEX_SHADER
     }
     ShaderType;
 
@@ -480,6 +480,7 @@ extern "C"
     {
         ShaderType type;
         string source, path;
+        size_t _len;
         GLuint _glid;
     }
     *Shader;
@@ -493,42 +494,24 @@ extern "C"
     *ShaderProgram;
 
     // intiializes a shader program
-    extern ShaderProgram shader_create_program();
+    extern ShaderProgram shader_program_create();
     // compiles a shader program
     extern void shader_program_compile(ShaderProgram program);
     extern void shader_program_link(ShaderProgram program);
     extern void shader_program_attach(ShaderProgram program); 
     extern void shader_program_detach(ShaderProgram program);
 
-    // janky but working c preprocessor vec & matrix uploading
-    #define __shader_program_upload_template(args, args_alt, type_lower)\
-    extern void shader_program_upload_ ## type_lower ## ( ## args ## );\
-    extern void shader_program_upload_ ## type_lower ## u( ## args ## );
+    extern void shader_program_upload_matrix_double_2x2(ShaderProgram program, string var, Matrix_double_2x2 matrix);
+    extern void shader_program_upload_matrix_double_2x2u(ShaderProgram program, string var, Matrix_double_2x2U matrix);
+
+    extern void shader_program_upload_shader(ShaderProgram program, Shader shader);
+    extern void shader_program_remove_shader(ShaderProgram program, Shader shader);
+    extern void shader_program_upload_shaders(ShaderProgram program, ArrayList shaders);
+    extern void shader_program_remove_shaders(ShaderProgram program, ArrayList shaders);
+
+    extern Shader shader_create(ShaderType type, bool file, string src);
+    extern void shader_compile(Shader shader);
     
-    __shader_program_upload_template(Matrix_double_2x2 matrix, Matrix_double_2x2U matrix, matrix_double_2x2);
-    __shader_program_upload_template(Matrix_double_3x2 matrix, Matrix_double_3x2U matrix, matrix_double_3x2);
-    __shader_program_upload_template(Matrix_double_3x3 matrix, Matrix_double_3x3U matrix, matrix_double_3x3);
-    __shader_program_upload_template(Matrix_double_4x3 matrix, Matrix_double_4x3U matrix, matrix_double_4x3);
-    __shader_program_upload_template(Matrix_double_4x4 matrix, Matrix_double_4x4U matrix, matrix_double_4x4);
-    __shader_program_upload_template(Matrix_int_2x2 matrix, Matrix_int_2x2U matrix, matrix_int_2x2);
-    __shader_program_upload_template(Matrix_int_3x2 matrix, Matrix_int_3x2U matrix, matrix_int_3x2);
-    __shader_program_upload_template(Matrix_int_3x3 matrix, Matrix_int_3x3U matrix, matrix_int_3x3);
-    __shader_program_upload_template(Matrix_int_4x3 matrix, Matrix_int_4x3U matrix, matrix_int_4x3);
-    __shader_program_upload_template(Matrix_int_4x4 matrix, Matrix_int_4x4U matrix, matrix_int_4x4);
-    __shader_program_upload_template(Matrix_float_2x2 matrix, Matrix_float_2x2U matrix, matrix_float_2x2);
-    __shader_program_upload_template(Matrix_float_3x2 matrix, Matrix_float_3x2U matrix, matrix_float_3x2);
-    __shader_program_upload_template(Matrix_float_3x3 matrix, Matrix_float_3x3U matrix, matrix_float_3x3);
-    __shader_program_upload_template(Matrix_float_4x3 matrix, Matrix_float_4x3U matrix, matrix_float_4x3);
-    __shader_program_upload_template(Matrix_float_4x4 matrix, Matrix_float_4x4U matrix, matrix_float_4x4);
-    __shader_program_upload_template(Vector_double_2 vector, Vector_double_2U vector, vector_double_2);
-    __shader_program_upload_template(Vector_double_3 vector, Vector_double_3U vector, vector_double_3);
-    __shader_program_upload_template(Vector_double_4 vector, Vector_double_4U vector, vector_double_4);
-    __shader_program_upload_template(Vector_int_2 vector, Vector_int_2U vector, vector_int_2);
-    __shader_program_upload_template(Vector_int_3 vector, Vector_int_3U vector, vector_int_3);
-    __shader_program_upload_template(Vector_int_4 vector, Vector_int_4U vector, vector_int_4);
-    __shader_program_upload_template(Vector_float_2 vector, Vector_float_2U vector, vector_float_2);
-    __shader_program_upload_template(Vector_float_3 vector, Vector_float_3U vector, vector_float_3);
-    __shader_program_upload_template(Vector_float_4 vector, Vector_float_4U vector, vector_float_4);
 
 #ifdef __cplusplus
 }
