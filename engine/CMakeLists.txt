@@ -9,6 +9,7 @@ set(ENGINE_SOURCES
     engine/util/log.c
     engine/util/time.c
     engine/util/file.c
+    engine/util/default.c
     engine/data/arraylist.c
     engine/math/matrix.c
     engine/math/vector.c

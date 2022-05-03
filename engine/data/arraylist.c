@@ -51,7 +51,7 @@ bool arraylist_contains(ArrayList list, void *value)
 
 void arraylist_set(ArrayList list, int index, void *value)
 {
-    void **data = (list->data + (sizeof(void*) * index));
+    void **data = list->data + (sizeof(void*) * index);
     *data = value;
 }
 

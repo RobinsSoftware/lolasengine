@@ -22,17 +22,17 @@ Created by Lola Robins
 
 #include <lolasengine/engine.h>
 
-ShaderProgram shader_create_program()
+ShaderProgram shader_program_create()
 {
     ShaderProgram program = calloc(1, sizeof(struct ShaderProgram));
-    memory_track(GC_END_OF_PROGRAM, program, (MemoryFinalizer) &shader_free_program);
+    memory_track(GC_END_OF_PROGRAM, program, (MemoryFinalizer) &shader_program_detach);
     program->shaders = arraylist_create();
     program->_glid = -1;
     program->_inuse = false;
     return program;
 }
 
-void shader_compile_program(ShaderProgram program)
+void shader_program_compile(ShaderProgram program)
 {
     if (program->_glid != -1)
         glDeleteProgram(program->_glid);
@@ -53,13 +53,13 @@ void shader_compile_program(ShaderProgram program)
     }
 }
 
-void shader_link_program(ShaderProgram program)
+void shader_program_link(ShaderProgram program)
 {
     if(program->_glid != -1)
         glLinkProgram(program->_glid);
 }
 
-void shader_attach_program(ShaderProgram program)
+void shader_program_attach(ShaderProgram program)
 {
     if(program->_inuse)
         return;
@@ -68,7 +68,7 @@ void shader_attach_program(ShaderProgram program)
     program->_inuse = true;
 }
 
-void shader_detach_program(ShaderProgram program)
+void shader_program_detach(ShaderProgram program)
 {
     if (!program->_inuse)
         return;
@@ -77,7 +77,4 @@ void shader_detach_program(ShaderProgram program)
     program->_inuse = false;
 }
 
-void shader_free_program(ShaderProgram program)
-{   
-    shader_detach_program(program);
-}
+vpod
