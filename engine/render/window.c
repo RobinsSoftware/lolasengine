@@ -164,7 +164,7 @@ ErrorCode window_launch(void)
 
         glfwPollEvents();
 
-        glClearColor(scene->R, scene->G, scene->B, scene->A);
+        glClearColor(scene->color.r, scene->color.g, scene->color.b, scene->color.a);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(window);

@@ -28,11 +28,6 @@ ShaderProgram default_shader_program()
 Scene default_scene()
 {
     Scene scene = scene_create();
-    
-    scene->R = 1;
-    scene->G = 0.75;
-    scene->B = 0.79;
-    scene->A = 1;
-
+    scene_color(scene, color_rgb_byte(255, 192, 203));
     return scene;
 }

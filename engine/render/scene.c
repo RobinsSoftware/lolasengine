@@ -18,6 +18,7 @@ Created by Lola Robins
 */
 
 #include <lolasengine/engine.h>
+#include <string.h>
 
 Scene scene_create()
 {
@@ -25,17 +26,11 @@ Scene scene_create()
     return scene;
 }
 
-void scene_rgb(float r, float g, float b)
+void scene_color(Scene scene, Color color)
 {
-
+    scene->color.r = color->r;
+    scene->color.g = color->g;
+    scene->color.b = color->b;
+    scene->color.a = color->a;
 }
 
-void scene_rgba(float r, float g, float b, float a)
-{
-
-}
-
-void scene_rgb_hex(char hex[7])
-{
-
-}

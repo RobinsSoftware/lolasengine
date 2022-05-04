@@ -12,6 +12,7 @@ set(ENGINE_SOURCES
     engine/util/file.c
     engine/util/default.c
     engine/data/arraylist.c
+    engine/data/color.c
     engine/math/matrix.c
     engine/math/vector.c
     PARENT_SCOPE)

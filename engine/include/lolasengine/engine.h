@@ -86,6 +86,17 @@ extern "C"
     // clears all elements
     extern void arraylist_clear(ArrayList list);
 
+    // color
+
+    typedef struct Color
+    {
+        float r, g, b, a;
+    }
+    *Color;
+
+    // gets a color with a provided rgb value
+    extern Color color_rgb_byte(byte red, byte green, byte blue);
+
     // +------------------------------------------------------------+
     // |  * util/                                                   |
     // +------------------------------------------------------------+
@@ -479,18 +490,14 @@ extern "C"
 
     typedef struct Scene
     {
-        float R, G, B, A;
+        struct Color color;
     }
     *Scene;
 
     // initializes a new scene
     extern Scene scene_create();
-    // sets the rgb value based off provided float values
-    extern void scene_rgb(float r, float g, float b);
-    // sets the rgba value based off provided float values
-    extern void scene_rgba(float r, float g, float b, float a);
-    // sets the rgb value based off a provided hexadecimal string
-    extern void scene_rgb_hex(char hex[7]);
+    // sets the clear color of the scene
+    extern void scene_color(Scene scene, Color color);
 
     // shader
 
