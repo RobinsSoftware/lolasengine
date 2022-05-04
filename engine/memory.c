@@ -28,6 +28,33 @@ Created by Lola Robins
 
 ArrayList events[EVENT_LAST + 1], groups[GC_LAST + 1];
 
+void *memory_alloc(int group_id, int size)
+{
+    void *ptr = calloc(1, size);
+    memory_track(group_id, ptr, NULL);
+    return ptr;
+}
+
+void *memory_alloc_event(int event_id, int size)
+{
+    void *ptr = calloc(1, size);
+    memory_track_event(event_id, ptr, NULL);
+    return ptr;
+}
+
+void *memory_realloc(void *ptr, int size)
+{
+    MemoryNode node = memory_find(ptr);
+    void *new = realloc(ptr, size);
+
+    if (node != NULL)
+        node->memory = new;
+    else
+        print_error_s("MEMORY", "Memory address provided is not stored by the garbage collector. (memory_realloc).");
+
+    return new;
+}
+
 MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer)
 {
     if (memory == NULL)
@@ -154,6 +181,11 @@ void memory_free_all_event(int event_id)
     free(events[event_id]);
     
     events[event_id] = NULL;
+}
+
+void memory_attach_finalizer(MemoryNode node, MemoryFinalizer finalizer)
+{
+    node->finalizer = finalizer;
 }
 
 MemoryNode memory_find(void *value)

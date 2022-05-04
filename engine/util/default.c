@@ -22,9 +22,17 @@ Created by Lola Robins
 ShaderProgram default_shader_program()
 {
     ShaderProgram shader = shader_program_create();
+    return shader;
 }
 
-default_scene()
+Scene default_scene()
 {
+    Scene scene = scene_create();
+    
+    scene->R = 1;
+    scene->G = 0.75;
+    scene->B = 0.79;
+    scene->A = 1;
 
+    return scene;
 }

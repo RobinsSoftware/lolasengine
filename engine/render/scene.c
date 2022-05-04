@@ -16,3 +16,26 @@ limitations under the License.
 Created by Lola Robins
 <lola@robinssoftware.ca>
 */
+
+#include <lolasengine/engine.h>
+
+Scene scene_create()
+{
+    Scene scene = memory_alloc(GC_END_OF_PROGRAM, sizeof(struct Scene));
+    return scene;
+}
+
+void scene_rgb(float r, float g, float b)
+{
+
+}
+
+void scene_rgba(float r, float g, float b, float a)
+{
+
+}
+
+void scene_rgb_hex(char hex[7])
+{
+
+}

@@ -391,6 +391,12 @@ extern "C"
     #define GC_LAST GC_GROUP_4
     #endif
 
+    // allocates memory and tracks it on the group set
+    extern void *memory_alloc(int group_id, int size);
+    // allocates memory and tracks it on the event set
+    extern void *memory_alloc_event(int event_id, int size);
+    // reallocates memory previously allocated by the collector
+    extern void *memory_realloc(void *ptr, int size);
     // track memory for removal with a specified group during runtime
     extern MemoryNode memory_track(int group_id, void *memory, MemoryFinalizer finalizer);
     // track memory for removal after an event is called during runtime
@@ -402,6 +408,8 @@ extern "C"
     extern void memory_free_all(int group_id);
     // frees all memory assigned to an event after an event has finished execution
     extern void memory_free_all_event(int event_id);
+    // attaches a finalizer to a memory node
+    extern void memory_attach_finalizer(MemoryNode node, MemoryFinalizer finalizer);
     // finds the corresponding node for memory being tracked 
     extern MemoryNode memory_find(void *value);
 
@@ -467,6 +475,23 @@ extern "C"
     // set window can be resized
     extern void window_resizable(bool window_resizable);
 
+    // scene
+
+    typedef struct Scene
+    {
+        float R, G, B, A;
+    }
+    *Scene;
+
+    // initializes a new scene
+    extern Scene scene_create();
+    // sets the rgb value based off provided float values
+    extern void scene_rgb(float r, float g, float b);
+    // sets the rgba value based off provided float values
+    extern void scene_rgba(float r, float g, float b, float a);
+    // sets the rgb value based off a provided hexadecimal string
+    extern void scene_rgb_hex(char hex[7]);
+
     // shader
 
     typedef enum ShaderType
@@ -493,7 +518,7 @@ extern "C"
     }
     *ShaderProgram;
 
-    // intiializes a shader program
+    // intializes a shader program
     extern ShaderProgram shader_program_create();
     // compiles a shader program
     extern void shader_program_compile(ShaderProgram program);
@@ -504,14 +529,26 @@ extern "C"
     extern void shader_program_upload_matrix_double_2x2(ShaderProgram program, string var, Matrix_double_2x2 matrix);
     extern void shader_program_upload_matrix_double_2x2u(ShaderProgram program, string var, Matrix_double_2x2U matrix);
 
+    // uploads a shader to a shader program
     extern void shader_program_upload_shader(ShaderProgram program, Shader shader);
+    // removes a shader from a shader program
     extern void shader_program_remove_shader(ShaderProgram program, Shader shader);
+    // adds multiple shaders to a shader program
     extern void shader_program_upload_shaders(ShaderProgram program, ArrayList shaders);
+    // removes multiple shaders from a shader program
     extern void shader_program_remove_shaders(ShaderProgram program, ArrayList shaders);
 
+    // creates a new empty shader
     extern Shader shader_create(ShaderType type, bool file, string src);
+    // compiles a shader (mainly internal)
     extern void shader_compile(Shader shader);
+
+    // +------------------------------------------------------------+
+    // |  * defaults!                                               |
+    // +------------------------------------------------------------+
     
+    // gets the default engine scene
+    extern Scene default_scene();
 
 #ifdef __cplusplus
 }

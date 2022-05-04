@@ -5,6 +5,7 @@ set(ENGINE_SOURCES
     engine/memory.c
     engine/render/window.c
     engine/render/shader.c
+    engine/render/scene.c
     engine/util/input.c
     engine/util/log.c
     engine/util/time.c

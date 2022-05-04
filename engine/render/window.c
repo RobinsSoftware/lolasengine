@@ -28,6 +28,8 @@ Created by Lola Robins
 static GLFWwindow *window;
 static GLFWmonitor *monitor;
 
+static Scene scene = NULL;
+
 static string title = "lolasengine";
 static int width = 640, height = 480, target_fps = -1;
 static bool fullscreen = false, use_native_res = true, resizable = false;
@@ -151,13 +153,18 @@ ErrorCode window_launch(void)
     unsigned long frame_end = time_current_micros();
     unsigned long delta_time = 0;
 
+    if (scene == NULL)
+    {
+        scene = default_scene();
+    }
+
     while (!glfwWindowShouldClose(window))
     {
         event_call(EVENT_WINDOW_LOOP, NullArgs);
 
         glfwPollEvents();
 
-        glClearColor(0.5, 0.5, 0.5, 1);
+        glClearColor(scene->R, scene->G, scene->B, scene->A);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(window);
@@ -203,4 +210,9 @@ void window_resizable(bool window_resizable)
 {
     resizable = window_resizable;
     dimension_update();
+}
+
+void window_scene(Scene new_scene)
+{
+
 }
